@@ -1,0 +1,13 @@
+{
+  "domain": "rheem_eziset",
+  "name": "Rheem EziSET",
+  "codeowners": [
+    "@illuzn"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/illuzn/rheem-eziset",
+  "integration_type": "device",
+  "iot_class": "local polling",
+  "issue_tracker": "https://github.com/illuzn/rheem-eziset/issues",
+  "version": "2023.12.0"
+}
