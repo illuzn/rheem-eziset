@@ -56,6 +56,9 @@ Home Assistant instance running and already configured with the included
 [`configuration.yaml`](./config/configuration.yaml)
 file.
 
+Note: There is a known issue with the bash debugger that runs the develop script. It will pause on the first line of the script, simply press continue and Home Assistant should start.
+Also note that you cannot stop the Home Assistant instance by pressing the stop debugging button. You must stop the Home Assistant process tree first (ctrl+c in terminal is easiest).
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under its MIT License.

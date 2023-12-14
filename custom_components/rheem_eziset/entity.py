@@ -1,25 +1,35 @@
-"""BlueprintEntity class."""
+"""Sets up the basic entity template."""
 from __future__ import annotations
 
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION, DOMAIN, NAME, VERSION
-from .coordinator import BlueprintDataUpdateCoordinator
+from .const import DOMAIN, NAME, MANUFACTURER, VERSION
+from .coordinator import RheemEziSETDataUpdateCoordinator
 
+class RheemEziSETEntity(CoordinatorEntity):
+    """Basic entity definition used by all entities."""
 
-class IntegrationBlueprintEntity(CoordinatorEntity):
-    """BlueprintEntity class."""
-
-    _attr_attribution = ATTRIBUTION
-
-    def __init__(self, coordinator: BlueprintDataUpdateCoordinator) -> None:
-        """Initialize."""
+    def __init__(self, coordinator: RheemEziSETDataUpdateCoordinator, entry):
+        """Initialise the entity."""
         super().__init__(coordinator)
-        self._attr_unique_id = coordinator.config_entry.entry_id
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.unique_id)},
-            name=NAME,
-            model=VERSION,
-            manufacturer=NAME,
-        )
+        self.entry = entry
+
+    @property
+    def device_info(self):
+        """Defines the device information."""
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.api.host)},
+            "name": NAME,
+            "manufacturer": MANUFACTURER,
+            "model": VERSION,
+        }
+
+    @property
+    def available(self) -> bool:
+        """Returns the availability of the device. Assume True if there is data."""
+        return not not self.coordinator.data
+
+    @property
+    def should_poll(self) -> bool:
+        """Device should not poll because this is handled by async requests in the api."""
+        return False

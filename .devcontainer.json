@@ -1,23 +1,16 @@
 {
-    "name": "ludeeus/integration_blueprint",
+    "name": "illuzn/rheem_eziset",
     "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
     "postCreateCommand": "scripts/setup",
-    "forwardPorts": [
-        8123
-    ],
-    "portsAttributes": {
-        "8123": {
-            "label": "Home Assistant",
-            "onAutoForward": "notify"
-        }
-    },
+    "appPort": ["8123:8123"],
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
                 "github.vscode-pull-request-github",
                 "ryanluker.vscode-coverage-gutters",
-                "ms-python.vscode-pylance"
+                "ms-python.vscode-pylance",
+                "rogalmic.bash-debug"
             ],
             "settings": {
                 "files.eol": "\n",

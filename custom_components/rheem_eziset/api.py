@@ -1,90 +1,61 @@
-"""Sample API Client."""
-from __future__ import annotations
+"""All API calls belong here."""
+import requests
 
-import asyncio
-import socket
+from .const import LOGGER, DOMAIN
 
-import aiohttp
-import async_timeout
+class RheemEziSETApi:
+    """This class defines the Rheem EziSET API."""
+
+    def __init__(self, host: str) -> None:
+        """Initialise the basic parameters."""
+        self.host = host
+        self.base_url = "http://" + self.host + "/"
+
+    def getInfo_data(self) -> dict:
+        """Create a session and get getInfo.cgi."""
+        url = self.base_url + "getInfo.cgi"
+        session = requests.Session()
+        response = session.get(url, verify=False)
+        LOGGER.debug(f"{DOMAIN} - getInfo.cgi response {response.text}")
+        if response.headers.get('content-type') == 'application/json':
+            try:
+                data_response: dict = response.json()
+            except Exception:
+                LOGGER.error(f"{DOMAIN} - couldn't convert response for {url} into json. Response was: {response}")
+            return data_response
+        else:
+            LOGGER.error(f"{DOMAIN} - received response for {url} but it doesn't appear to be json.")
+
+    def get_XXXdata(self) -> dict:
+        """Unused example."""
+        url = self.base_url + "users/login"
+        session = requests.Session()
+        response = session.get(url, verify=False)
+
+        # login with password
+        url = self.base_url + "users/login"
+        data = {"_method": "POST", "STLoginPWField": "", "function": "save"}
+        response = session.post(url, headers=self.headers, data=data, verify=False)
+        LOGGER.debug(f"{DOMAIN} - login response {response.text}")
+
+        # actualize data request
+        url = self.base_url + "home/actualizedata"
+        response = session.post(url, headers=self.headers, verify=False)
+        LOGGER.debug(f"{DOMAIN} - actualizedata response {response.text}")
+        data_response: dict = response.json()
+
+        # actualize signals request
+        url = self.base_url + "home/actualizesignals"
+        response = session.post(url, headers=self.headers, verify=False)
+        LOGGER.debug(f"{DOMAIN} - actualizesignals response {response.text}")
+        signal_response: dict = response.json()
+
+        # logout
+        url = self.base_url + "users/logout"
+        response = session.get(url, verify=False)
+
+        merged_response = data_response | signal_response
+        LOGGER.debug(f"{DOMAIN} - merged_response {merged_response}")
+        return merged_response
 
 
-class IntegrationBlueprintApiClientError(Exception):
-    """Exception to indicate a general API error."""
-
-
-class IntegrationBlueprintApiClientCommunicationError(
-    IntegrationBlueprintApiClientError
-):
-    """Exception to indicate a communication error."""
-
-
-class IntegrationBlueprintApiClientAuthenticationError(
-    IntegrationBlueprintApiClientError
-):
-    """Exception to indicate an authentication error."""
-
-
-class IntegrationBlueprintApiClient:
-    """Sample API Client."""
-
-    def __init__(
-        self,
-        username: str,
-        password: str,
-        session: aiohttp.ClientSession,
-    ) -> None:
-        """Sample API Client."""
-        self._username = username
-        self._password = password
-        self._session = session
-
-    async def async_get_data(self) -> any:
-        """Get data from the API."""
-        return await self._api_wrapper(
-            method="get", url="https://jsonplaceholder.typicode.com/posts/1"
-        )
-
-    async def async_set_title(self, value: str) -> any:
-        """Get data from the API."""
-        return await self._api_wrapper(
-            method="patch",
-            url="https://jsonplaceholder.typicode.com/posts/1",
-            data={"title": value},
-            headers={"Content-type": "application/json; charset=UTF-8"},
-        )
-
-    async def _api_wrapper(
-        self,
-        method: str,
-        url: str,
-        data: dict | None = None,
-        headers: dict | None = None,
-    ) -> any:
-        """Get information from the API."""
-        try:
-            async with async_timeout.timeout(10):
-                response = await self._session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    json=data,
-                )
-                if response.status in (401, 403):
-                    raise IntegrationBlueprintApiClientAuthenticationError(
-                        "Invalid credentials",
-                    )
-                response.raise_for_status()
-                return await response.json()
-
-        except asyncio.TimeoutError as exception:
-            raise IntegrationBlueprintApiClientCommunicationError(
-                "Timeout error fetching information",
-            ) from exception
-        except (aiohttp.ClientError, socket.gaierror) as exception:
-            raise IntegrationBlueprintApiClientCommunicationError(
-                "Error fetching information",
-            ) from exception
-        except Exception as exception:  # pylint: disable=broad-except
-            raise IntegrationBlueprintApiClientError(
-                "Something really wrong happened!"
-            ) from exception

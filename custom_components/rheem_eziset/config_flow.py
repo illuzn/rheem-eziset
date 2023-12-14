@@ -1,80 +1,109 @@
-"""Adds config flow for Blueprint."""
+"""Adds config flow for Rheem EziSET."""
 from __future__ import annotations
 
 import voluptuous as vol
+import traceback
+
 from homeassistant import config_entries
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.helpers import selector
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.core import callback
+from homeassistant.const import CONF_HOST
 
-from .api import (
-    IntegrationBlueprintApiClient,
-    IntegrationBlueprintApiClientAuthenticationError,
-    IntegrationBlueprintApiClientCommunicationError,
-    IntegrationBlueprintApiClientError,
-)
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, CONF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL
+from .api import RheemEziSETApi
 
-
-class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Blueprint."""
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for rheem_eziset."""
 
     VERSION = 1
+    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    async def async_step_user(
-        self,
-        user_input: dict | None = None,
-    ) -> config_entries.FlowResult:
+    def __init__(self):
+        """Initialise the flow with no errors."""
+        self._errors = {}
+
+    async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
-        _errors = {}
+        self._errors = {}
+
+        if self._async_current_entries():
+            return self.async_abort(reason="single_instance_allowed")
+
         if user_input is not None:
-            try:
-                await self._test_credentials(
-                    username=user_input[CONF_USERNAME],
-                    password=user_input[CONF_PASSWORD],
-                )
-            except IntegrationBlueprintApiClientAuthenticationError as exception:
-                LOGGER.warning(exception)
-                _errors["base"] = "auth"
-            except IntegrationBlueprintApiClientCommunicationError as exception:
-                LOGGER.error(exception)
-                _errors["base"] = "connection"
-            except IntegrationBlueprintApiClientError as exception:
-                LOGGER.exception(exception)
-                _errors["base"] = "unknown"
+            # Test connectivity
+            valid = await self._test_host(user_input[CONF_HOST])
+
+            if valid:
+                return self.async_create_entry(title=user_input[CONF_HOST], data=user_input)
             else:
-                return self.async_create_entry(
-                    title=user_input[CONF_USERNAME],
-                    data=user_input,
-                )
+                self._errors["base"] = "connection"
+
+            return await self._show_config_form(user_input)
+
+        return await self._show_config_form(user_input)
+
+    async def _show_config_form(self, user_input): # pylint: disable=unused-argument
+        return self.async_show_form(
+            step_id="user",
+            data_schema=vol.Schema(
+                {vol.Required(CONF_HOST): str}
+            ),
+            errors=self._errors,
+        )
+
+    async def _test_host(self, host: str) -> None:
+        """Validate host."""
+        try:
+            api = RheemEziSETApi(host=host)
+            await self.hass.async_add_executor_job(api.getInfo_data)
+            return True
+        except Exception as ex: # pylint: disable=broad-except
+            LOGGER.error(
+                f"{DOMAIN} Exception in connection: $s - trackback: %s",
+                ex,
+                traceback.format_exc(),
+            )
+        return False
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Allow the options to be configured."""
+        return OptionsFlow(config_entry)
+
+class OptionsFlow(config_entries.OptionsFlow):
+    """Options flow for Rheem EziSET."""
+
+    def __init__(self, config_entry):
+        """Initialise the options flow."""
+        self.config_entry = config_entry
+        self.options = dict(config_entry.options)
+
+    async def async_step_int(self, user_input=None): # pylint: disable=unused-argument
+        """Handle flow."""
+        return await self.async_step_user()
+
+    async def async_step_user(self, user_input=None):
+        """Handle flow initiated by user."""
+        if user_input is not None:
+            self.options.update(user_input)
+            return await self._update_options()
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
                     vol.Required(
-                        CONF_USERNAME,
-                        default=(user_input or {}).get(CONF_USERNAME),
-                    ): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.TEXT
+                        CONF_SYNC_INTERVAL,
+                        default=self.options.get(
+                            CONF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL
                         ),
-                    ),
-                    vol.Required(CONF_PASSWORD): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.PASSWORD
-                        ),
-                    ),
+                    ): vol.All(vol.Coerce(int))
                 }
-            ),
-            errors=_errors,
+            )
         )
 
-    async def _test_credentials(self, username: str, password: str) -> None:
-        """Validate credentials."""
-        client = IntegrationBlueprintApiClient(
-            username=username,
-            password=password,
-            session=async_create_clientsession(self.hass),
+    async def _update_options(self):
+        """Process options."""
+        return self.async_create_entry(
+            title=self.config_entry.data.get(CONF_SYNC_INTERVAL), data=self.options
         )
-        await client.async_get_data()

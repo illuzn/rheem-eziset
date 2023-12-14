@@ -2,17 +2,28 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/ludeeus/integration_blueprint",
+                "title": "Rheem Eziset Host",
+                "description": "Please provide the local IPv4 address of your Rheem EziSET water heater.",
                 "data": {
-                    "username": "Username",
-                    "password": "Password"
+                    "host": "0.0.0.0"
                 }
             }
         },
         "error": {
-            "auth": "Username/Password is wrong.",
-            "connection": "Unable to connect to the server.",
-            "unknown": "Unknown error occurred."
+            "connection": "Unable to connect to the device."
+        },
+        "abort": {
+            "single_instance_allowed": "Only a single instance is allowed."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Rheem Eziset Configuration",
+                "data": {
+                    "sync_interval": "Sync Interval to Fetch Data in Seconds"
+                }
+            }
         }
     }
 }
