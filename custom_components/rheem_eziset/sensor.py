@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.const import TIME_MINUTES, VOLUME_LITERS, STATE_UNAVAILABLE
+from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass
+from homeassistant.helpers.entity import EntityCategory
+from homeassistant.const import TIME_MINUTES, TIME_SECONDS, VOLUME_LITERS, STATE_UNAVAILABLE
 
 from .const import ICON_TAPON, ICON_TAPOFF, ICON_WATERHEATER, CONST_MODE_MAP, CONST_STATUS_MAP, DOMAIN
 from .coordinator import RheemEziSETDataUpdateCoordinator
@@ -14,17 +15,21 @@ async def async_setup_entry(hass, entry, async_add_devices):
     coordinator = hass.data[DOMAIN]
 
     SENSOR_MAP = [
-        #("id",    "description",   "key",      "unit",                             "icon",             "device_class", "state_class",                  "entity_category"),
-        ("flow",    "Flow",         "flow",     f"{VOLUME_LITERS}/{TIME_MINUTES}",  ICON_TAPON,        None,           SensorStateClass.MEASUREMENT,   None),
-        ("status",  "Status",       "state",    None,                               ICON_WATERHEATER, None,           None,                           None),
-        ("mode",    "Mode",         "mode",     None,                               ICON_WATERHEATER, None,           None,                           None),
+        #("description",    "key",        "unit",                               "icon",             "device_class", "state_class",                  "entity_category"),
+        ("Flow",            "flow",        f"{VOLUME_LITERS}/{TIME_MINUTES}",   ICON_TAPON,         None,           SensorStateClass.MEASUREMENT,   None),
+        ("Status",          "state",       None,                                ICON_WATERHEATER,   None,           None,                           None),
+        ("Mode",            "mode",        None,                                ICON_WATERHEATER,   None,           None,                           None),
+        ("Status raw",      "state",       None,                                ICON_WATERHEATER,   None,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        ("Mode raw",        "mode",        None,                                ICON_WATERHEATER,   None,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        ("Heater error raw","appErrCode",  None,                                ICON_WATERHEATER,   None,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        ("Session timeout", "sTimeout",    TIME_SECONDS,                        ICON_WATERHEATER,   SensorDeviceClass.DURATION,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
     ]
 
     sensors = [
         RheemEziSETSensor(
-            coordinator, entry, id, description, key, unit, icon, device_class, state_class, entity_category
+            coordinator, entry, description, key, unit, icon, device_class, state_class, entity_category
         )
-        for id, description, key, unit, icon, device_class, state_class, entity_category in SENSOR_MAP
+        for description, key, unit, icon, device_class, state_class, entity_category in SENSOR_MAP
     ]
 
     async_add_devices(sensors, True)
@@ -36,7 +41,6 @@ class RheemEziSETSensor(RheemEziSETEntity):
             self,
             coordinator: RheemEziSETDataUpdateCoordinator,
             entry: ConfigEntry,
-            id: str,
             description: str,
             key: str,
             unit: str,
@@ -47,7 +51,6 @@ class RheemEziSETSensor(RheemEziSETEntity):
         ) -> None:
             """Initialize the sensor."""
             super().__init__(coordinator, entry)
-            self._id = id
             self.description = description
             self.key = key
             self.unit = unit
@@ -55,50 +58,52 @@ class RheemEziSETSensor(RheemEziSETEntity):
             self._device_class = device_class
             self._state_class = state_class
             self._entity_category = entity_category
+            self._attr_has_entity_name = True
 
     @property
-    def native_value(self):
-        """Return the native value of the sensor."""
-        with self.coordinator.data.get(self.key) as result:
-            if self._id == "status":
-                if int(result) in CONST_STATUS_MAP:
-                    return CONST_STATUS_MAP[int(result)][1]
-                return STATE_UNAVAILABLE
-            elif self._id == "mode":
-                if int(result) in CONST_MODE_MAP:
-                    return CONST_MODE_MAP[int(result)][1]
-                return STATE_UNAVAILABLE
-            elif result is not None:
-                return result
-            else:
-                return STATE_UNAVAILABLE
+    def state(self):
+        """Return the state of the sensor."""
+        result = self.coordinator.data[self.key]
+        if self.description == "Status":
+            if int(result) in CONST_STATUS_MAP:
+                return CONST_STATUS_MAP[int(result)][0]
+            return STATE_UNAVAILABLE
+        elif self.description == "Mode":
+            if int(result) in CONST_MODE_MAP:
+                return CONST_MODE_MAP[int(result)][0]
+            return STATE_UNAVAILABLE
+        elif result is not None:
+            return result
+        else:
+            return STATE_UNAVAILABLE
+
     @property
-    def native_unit_of_measurement(self):
-        """Return the native unit of measurement of the sensor."""
+    def unit_of_measurement(self):
+        """Return the unit of measurement of the sensor."""
         return self.unit
 
     @property
     def icon(self):
         """Return the icon with processing in the case of some sensors."""
-        with self.coordinator.data.get(self.key) as result:
-            if self._id == "flow":
-                try:
-                    if float(result) != 0:
-                        return ICON_TAPON
-                    else:
-                        return ICON_TAPOFF
-                except Exception: # pylint: disable=unused-argument
-                    return  ICON_TAPOFF
-            elif self._id == "status":
-                if int(result) in CONST_STATUS_MAP:
-                    return CONST_STATUS_MAP[int(result)][2]
-                return self._icon
-            elif self._id == "mode":
-                if int(result) in CONST_MODE_MAP:
-                    return CONST_MODE_MAP[int(result)][2]
-                return self._icon
-            else:
-                return self._icon
+        result = self.coordinator.data[self.key]
+        if self.description == "Flow":
+            try:
+                if float(result) != 0:
+                    return ICON_TAPON
+                else:
+                    return ICON_TAPOFF
+            except Exception: # pylint: disable=unused-argument
+                return  ICON_TAPOFF
+        elif self.description == "Status":
+            if int(result) in CONST_STATUS_MAP:
+                return CONST_STATUS_MAP[int(result)][1]
+            return self._icon
+        elif self.description == "Mode":
+            if int(result) in CONST_MODE_MAP:
+                return CONST_MODE_MAP[int(result)][1]
+            return self._icon
+        else:
+            return self._icon
 
 
     @property
@@ -109,17 +114,12 @@ class RheemEziSETSensor(RheemEziSETEntity):
     @property
     def name(self):
         """Return the sensor name."""
-        return f"{self.description}"
-
-    @property
-    def id(self):
-        """Return the sensor id."""
-        return f"{DOMAIN}_{self._id}"
+        return self.description
 
     @property
     def unique_id(self):
         """Return a unique id."""
-        return f"{DOMAIN}-{self._id}-{self.coordinator.api.host}"
+        return f"{ConfigEntry.entry_id}-{self.description}"
 
     @property
     def state_class(self):

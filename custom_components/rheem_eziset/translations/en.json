@@ -20,8 +20,9 @@
         "step": {
             "user": {
                 "title": "Rheem Eziset Configuration",
+                "description": "Please provide a scan interval to update the sensors. Warning: Read the documentation before changing this.",
                 "data": {
-                    "sync_interval": "Sync Interval to Fetch Data in Seconds"
+                    "scan_interval": "15"
                 }
             }
         }

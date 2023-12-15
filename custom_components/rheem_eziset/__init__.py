@@ -14,7 +14,7 @@ from homeassistant.const import CONF_HOST
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .api import RheemEziSETApi
-from .const import DOMAIN, CONF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL, PLATFORMS
+from .const import DOMAIN, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, PLATFORMS
 from .coordinator import RheemEziSETDataUpdateCoordinator
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -24,12 +24,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     host = entry.data.get(CONF_HOST)
     api = RheemEziSETApi(host)
-    sync_interval = entry.options.get(CONF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL)
+    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
     coordinator = RheemEziSETDataUpdateCoordinator(
         hass,
         api=api,
-        update_interval=sync_interval
+        update_interval=scan_interval
     )
 
     await coordinator.async_refresh()

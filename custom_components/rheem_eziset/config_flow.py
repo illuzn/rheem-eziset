@@ -8,7 +8,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.const import CONF_HOST
 
-from .const import DOMAIN, LOGGER, CONF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL
+from .const import DOMAIN, LOGGER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
 from .api import RheemEziSETApi
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -66,8 +66,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
-        """Allow the options to be configured."""
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntries
+        ) -> config_entries.OptionsFlow:
+        """Create the options flow."""
         return OptionsFlow(config_entry)
 
 class OptionsFlow(config_entries.OptionsFlow):
@@ -78,7 +80,7 @@ class OptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
         self.options = dict(config_entry.options)
 
-    async def async_step_int(self, user_input=None): # pylint: disable=unused-argument
+    async def async_step_init(self, user_input): # pylint: disable=unused-argument
         """Handle flow."""
         return await self.async_step_user()
 
@@ -93,9 +95,9 @@ class OptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Required(
-                        CONF_SYNC_INTERVAL,
+                        CONF_SCAN_INTERVAL,
                         default=self.options.get(
-                            CONF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL
+                            CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
                         ),
                     ): vol.All(vol.Coerce(int))
                 }
@@ -105,5 +107,5 @@ class OptionsFlow(config_entries.OptionsFlow):
     async def _update_options(self):
         """Process options."""
         return self.async_create_entry(
-            title=self.config_entry.data.get(CONF_SYNC_INTERVAL), data=self.options
+            title=self.config_entry.data.get(CONF_SCAN_INTERVAL), data=self.options
         )

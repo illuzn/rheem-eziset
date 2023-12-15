@@ -7,19 +7,20 @@ LOGGER: Logger = getLogger(__package__)
 
 # Component Data
 NAME = "Rheem EziSET Water Heater"
+IDPREFIX = "rheem_water_heater_"
 DOMAIN = "rheem_eziset"
 MANUFACTURER = "Rheem"
 VERSION = "2023.12.0"
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
-#    Platform.BINARY_SENSOR,
+    Platform.BINARY_SENSOR,
 #    Platform.NUMBER,
 #    Platform.WATER_HEATER,
 ]
 
 # SCAN INTERVAL
-CONF_SYNC_INTERVAL = "sync_interval"
-DEFAULT_SYNC_INTERVAL = 30 # seconds
+CONF_SCAN_INTERVAL = "scan_interval"
+DEFAULT_SCAN_INTERVAL = 15 # seconds
 
 # Mode Dictionary
 CONST_MODE_MAP = {
