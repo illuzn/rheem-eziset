@@ -19,8 +19,9 @@ class RheemEziSETEntity(CoordinatorEntity):
         """Defines the device information."""
         return {
             "identifiers": {(DOMAIN, self.coordinator.api.host)},
-            "name": NAME,
+            "name": self.coordinator.data.get("heaterName", NAME),
             "manufacturer": MANUFACTURER,
+            "sw_version": self.coordinator.data.get("FWversion")
         }
 
     @property
