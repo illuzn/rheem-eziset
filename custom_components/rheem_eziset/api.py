@@ -16,15 +16,23 @@ class RheemEziSETApi:
         url = self.base_url + "getInfo.cgi"
         session = requests.Session()
         response = session.get(url, verify=False)
-        LOGGER.debug(f"{DOMAIN} - getInfo.cgi response {response.text}")
-        if response.headers.get('content-type') == 'application/json':
-            try:
-                data_response: dict = response.json()
-            except Exception:
-                LOGGER.error(f"{DOMAIN} - couldn't convert response for {url} into json. Response was: {response}")
-            return data_response
-        else:
-            LOGGER.error(f"{DOMAIN} - received response for {url} but it doesn't appear to be json.")
+        LOGGER.debug(f"{DOMAIN} - getInfo.cgi response: {response.text}")
+        return check_data(url=url, data=response)
+
+    def getConfig_data(self) -> dict:
+        """Create a session and get configuration params."""
+        session = requests.Session()
+
+        # Getting version.cgi
+        url = self.base_url + "version.cgi"
+        response = session.get(url, verify=False)
+
+        LOGGER.debug(f"{DOMAIN} - version.cgi response: {response.text}")
+
+        data_responses = check_data(url=url, data=response)
+
+
+        return data_responses
 
     def get_XXXdata(self) -> dict:
         """Unused example."""
@@ -59,3 +67,18 @@ class RheemEziSETApi:
         return merged_response
 
 
+def check_data(
+        url: str,
+        data,
+    ) -> dict:
+    """Check for valid json responses then convert to dict format."""
+    if url == "":
+        LOGGER.error(f"{DOMAIN} - api attempted to retrieve an empty url.")
+    if isinstance(data, dict) and data.headers.get('content-type') == "application/json":
+        try:
+            data_response:  dict = data.json()
+        except Exception:
+            LOGGER.error(f"{DOMAIN} - couldn't convert response for {url} into json. Response was: {data}")
+        return data_response
+    else:
+        LOGGER.error(f"{DOMAIN} - received response for {url} but it doesn't appear to be json. Response: {data}")

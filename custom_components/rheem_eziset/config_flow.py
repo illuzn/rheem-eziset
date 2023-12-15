@@ -8,7 +8,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.const import CONF_HOST
 
-from .const import DOMAIN, LOGGER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+from .const import DOMAIN, LOGGER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, CONF_CONFIG_SCAN_INTERVAL, DEFAULT_CONFIG_SCAN_INTERVAL
 from .api import RheemEziSETApi
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -25,10 +25,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a flow initialized by the user."""
         self._errors = {}
 
-        if self._async_current_entries():
-            return self.async_abort(reason="single_instance_allowed")
-
         if user_input is not None:
+            # Don't allow duplicates
+            with self._async_current_entries() as current_entries:
+                if user_input[CONF_HOST] in current_entries:
+                    return self.async_abort(reason="host_already_exists")
+
             # Test connectivity
             valid = await self._test_host(user_input[CONF_HOST])
 
@@ -80,32 +82,26 @@ class OptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
         self.options = dict(config_entry.options)
 
-    async def async_step_init(self, user_input): # pylint: disable=unused-argument
-        """Handle flow."""
-        return await self.async_step_user()
+    async def async_step_init(self, user_input = None):
+        """Handle an option flow."""
+        config = {**self.config_entry.data, **self.config_entry.options}
 
-    async def async_step_user(self, user_input=None):
-        """Handle flow initiated by user."""
         if user_input is not None:
-            self.options.update(user_input)
-            return await self._update_options()
+            config = {**config, **user_input}
+            return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
+                    vol.Optional(
                         CONF_SCAN_INTERVAL,
-                        default=self.options.get(
-                            CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
-                        ),
-                    ): vol.All(vol.Coerce(int))
+                        description={"suggested_value": DEFAULT_SCAN_INTERVAL}
+                    ): vol.All(vol.Coerce(int)),
+                    vol.Optional(
+                        CONF_CONFIG_SCAN_INTERVAL,
+                        description={"suggested_value": DEFAULT_CONFIG_SCAN_INTERVAL}
+                    ): vol.All(vol.Coerce(int)),
                 }
             )
-        )
-
-    async def _update_options(self):
-        """Process options."""
-        return self.async_create_entry(
-            title=self.config_entry.data.get(CONF_SCAN_INTERVAL), data=self.options
         )

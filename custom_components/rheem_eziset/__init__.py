@@ -11,31 +11,43 @@ import asyncio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_HOST
-from homeassistant.exceptions import ConfigEntryNotReady
 
 from .api import RheemEziSETApi
-from .const import DOMAIN, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, PLATFORMS
-from .coordinator import RheemEziSETDataUpdateCoordinator
+from .const import DOMAIN, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, CONF_CONFIG_SCAN_INTERVAL, DEFAULT_CONFIG_SCAN_INTERVAL, LOGGER, PLATFORMS
+from .coordinator import RheemEziSETDataUpdateCoordinator, RheemEziSETConfigUpdateCoordinator
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
+    LOGGER.debug(
+        "Setting up entry for device: %s",
+        entry.title,
+    )
+
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
 
     host = entry.data.get(CONF_HOST)
     api = RheemEziSETApi(host)
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    config_scan_interval = entry.options.get(CONF_CONFIG_SCAN_INTERVAL, DEFAULT_CONFIG_SCAN_INTERVAL)
 
-    coordinator = RheemEziSETDataUpdateCoordinator(
+    datacoordinator = RheemEziSETDataUpdateCoordinator(
         hass,
         api=api,
         update_interval=scan_interval
     )
 
-    await coordinator.async_refresh()
+    await datacoordinator.async_config_entry_first_refresh()
 
-    if not coordinator.last_update_success:
-        raise ConfigEntryNotReady
+    configcoordinator = RheemEziSETConfigUpdateCoordinator(
+        hass,
+        api=api,
+        update_interval=config_scan_interval
+    )
+
+    await configcoordinator.async_config_entry_first_refresh()
+
+    coordinator ={**datacoordinator, **configcoordinator}
 
     hass.data[DOMAIN] = coordinator
 
@@ -44,7 +56,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             coordinator.platforms.append(platform)
             hass.async_add_job(hass.config_entries.async_forward_entry_setup(entry, platform))
 
-    entry.add_update_listener(async_reload_entry)
+    entry.add_update_listener(async_reload_entry) # Reload the entry on configuration changes.
+
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
