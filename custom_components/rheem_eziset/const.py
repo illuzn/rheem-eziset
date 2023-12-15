@@ -22,9 +22,6 @@ PLATFORMS: list[Platform] = [
 CONF_SCAN_INTERVAL = "scan_interval"
 DEFAULT_SCAN_INTERVAL = 5 # seconds
 
-CONF_CONFIG_SCAN_INTERVAL = "config_scan_interval"
-DEFAULT_CONFIG_SCAN_INTERVAL = 60 # seconds. We slow the rate down on this one significantly because these values shouldn't change frequently.
-
 # Mode Dictionary
 CONST_MODE_MAP = {
     5:  ("Idle",                                    "mdi:water-boiler-auto"),

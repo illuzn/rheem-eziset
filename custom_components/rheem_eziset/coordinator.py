@@ -36,30 +36,3 @@ class RheemEziSETDataUpdateCoordinator(DataUpdateCoordinator):
             return await self.hass.async_add_executor_job(self.api.getInfo_data)
         except Exception as exception:
             raise UpdateFailed() from exception
-
-class RheemEziSETConfigUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching config data from the API."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        api: RheemEziSETApi,
-        update_interval: int
-    ) -> None:
-        """Initialize."""
-        self.api = api
-        self.platforms =[]
-
-        super().__init__(
-            hass=hass,
-            logger=LOGGER,
-            name=DOMAIN,
-            update_interval=timedelta(seconds=update_interval),
-        )
-
-    async def _async_update_data(self):
-        """Update basic data via client."""
-        try:
-            return await self.hass.async_add_executor_job(self.api.getConfig_data)
-        except Exception as exception:
-            raise UpdateFailed() from exception

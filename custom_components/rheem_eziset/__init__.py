@@ -13,8 +13,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_HOST
 
 from .api import RheemEziSETApi
-from .const import DOMAIN, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, CONF_CONFIG_SCAN_INTERVAL, DEFAULT_CONFIG_SCAN_INTERVAL, LOGGER, PLATFORMS
-from .coordinator import RheemEziSETDataUpdateCoordinator, RheemEziSETConfigUpdateCoordinator
+from .const import DOMAIN, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, LOGGER, PLATFORMS
+from .coordinator import RheemEziSETDataUpdateCoordinator
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
@@ -29,25 +29,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     host = entry.data.get(CONF_HOST)
     api = RheemEziSETApi(host)
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-    config_scan_interval = entry.options.get(CONF_CONFIG_SCAN_INTERVAL, DEFAULT_CONFIG_SCAN_INTERVAL)
 
-    datacoordinator = RheemEziSETDataUpdateCoordinator(
+    coordinator = RheemEziSETDataUpdateCoordinator(
         hass,
         api=api,
         update_interval=scan_interval
     )
 
-    await datacoordinator.async_config_entry_first_refresh()
-
-    configcoordinator = RheemEziSETConfigUpdateCoordinator(
-        hass,
-        api=api,
-        update_interval=config_scan_interval
-    )
-
-    await configcoordinator.async_config_entry_first_refresh()
-
-    coordinator ={**datacoordinator, **configcoordinator}
+    await coordinator.async_config_entry_first_refresh()
 
     hass.data[DOMAIN] = coordinator
 

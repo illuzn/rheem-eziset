@@ -6,7 +6,7 @@ from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.const import TIME_MINUTES, TIME_SECONDS, VOLUME_LITERS, STATE_UNAVAILABLE
 
-from .const import ICON_TAPON, ICON_TAPOFF, ICON_WATERHEATER, CONST_MODE_MAP, CONST_STATUS_MAP, DOMAIN
+from .const import ICON_TAPON, ICON_TAPOFF, ICON_WATERHEATER, CONST_MODE_MAP, CONST_STATUS_MAP, DOMAIN, LOGGER
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
@@ -63,19 +63,26 @@ class RheemEziSETSensor(RheemEziSETEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        result = self.coordinator.data[self.key]
+        result = self.coordinator.data.get(self.key, STATE_UNAVAILABLE)
         if self.description == "Status":
-            if int(result) in CONST_STATUS_MAP:
-                return CONST_STATUS_MAP[int(result)][0]
-            return STATE_UNAVAILABLE
+            try:
+                result = int(result)
+                if int(result) in CONST_STATUS_MAP:
+                    return CONST_STATUS_MAP[int(result)][0]
+                return STATE_UNAVAILABLE
+            except Exception:
+                LOGGER.error(f"{DOMAIN} -  Unexpected result for status, result was {result}")
+                return STATE_UNAVAILABLE
         elif self.description == "Mode":
-            if int(result) in CONST_MODE_MAP:
-                return CONST_MODE_MAP[int(result)][0]
-            return STATE_UNAVAILABLE
-        elif result is not None:
-            return result
+            try:
+                result = int(result)
+                if int(result) in CONST_MODE_MAP:
+                    return CONST_MODE_MAP[int(result)][0]
+                return STATE_UNAVAILABLE
+            except Exception:
+                LOGGER.error(f"{DOMAIN} -  Unexpected result for mode, result was {result}")
         else:
-            return STATE_UNAVAILABLE
+            return result
 
     @property
     def unit_of_measurement(self):
@@ -85,14 +92,14 @@ class RheemEziSETSensor(RheemEziSETEntity):
     @property
     def icon(self):
         """Return the icon with processing in the case of some sensors."""
-        result = self.coordinator.data[self.key]
+        result = self.coordinator.data.get(self.key, STATE_UNAVAILABLE)
         if self.description == "Flow":
             try:
                 if float(result) != 0:
                     return ICON_TAPON
                 else:
                     return ICON_TAPOFF
-            except Exception: # pylint: disable=unused-argument
+            except Exception:
                 return  ICON_TAPOFF
         elif self.description == "Status":
             if int(result) in CONST_STATUS_MAP:

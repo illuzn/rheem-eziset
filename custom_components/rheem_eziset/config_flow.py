@@ -8,7 +8,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.const import CONF_HOST
 
-from .const import DOMAIN, LOGGER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, CONF_CONFIG_SCAN_INTERVAL, DEFAULT_CONFIG_SCAN_INTERVAL
+from .const import DOMAIN, LOGGER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
 from .api import RheemEziSETApi
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -27,9 +27,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             # Don't allow duplicates
-            with self._async_current_entries() as current_entries:
-                if user_input[CONF_HOST] in current_entries:
-                    return self.async_abort(reason="host_already_exists")
+            current_entries = self._async_current_entries()
+            if user_input[CONF_HOST] in current_entries:
+                return self.async_abort(reason="host_already_exists")
 
             # Test connectivity
             valid = await self._test_host(user_input[CONF_HOST])
@@ -97,10 +97,6 @@ class OptionsFlow(config_entries.OptionsFlow):
                     vol.Optional(
                         CONF_SCAN_INTERVAL,
                         description={"suggested_value": DEFAULT_SCAN_INTERVAL}
-                    ): vol.All(vol.Coerce(int)),
-                    vol.Optional(
-                        CONF_CONFIG_SCAN_INTERVAL,
-                        description={"suggested_value": DEFAULT_CONFIG_SCAN_INTERVAL}
                     ): vol.All(vol.Coerce(int)),
                 }
             )
