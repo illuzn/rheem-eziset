@@ -6,7 +6,7 @@ from datetime import timedelta
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from.api import RheemEziSETApi
+from .api import RheemEziSETApi
 from .const import DOMAIN, LOGGER
 
 

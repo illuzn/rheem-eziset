@@ -12,19 +12,22 @@ class RheemEziSETApi:
         self.base_url = "http://" + self.host + "/"
 
     def getInfo_data(self) -> dict:
-        """Create a session and get getInfo.cgi."""
-        url = self.base_url + "getInfo.cgi"
+        """Create a session and gather sensor data."""
         session = requests.Session()
-        response = session.get(url, verify=False)
-        LOGGER.debug(f"{DOMAIN} - getInfo.cgi response {response.text}")
-        if response.headers.get('content-type') == 'application/json':
-            try:
-                data_response: dict = response.json()
-            except Exception:
-                LOGGER.error(f"{DOMAIN} - couldn't convert response for {url} into json. Response was: {response}")
-            return data_response
-        else:
-            LOGGER.error(f"{DOMAIN} - received response for {url} but it doesn't appear to be json.")
+
+        page = "getInfo.cgi"
+        data_responses = get_data(session=session, base_url=self.base_url, page=page)
+
+        page = "version.cgi"
+        data_responses = data_responses | get_data(session=session, base_url=self.base_url, page=page)
+
+        page = "getParams.cgi"
+        data_responses = data_responses | get_data(session=session, base_url=self.base_url, page=page)
+
+        page = "heaterName.cgi"
+        data_responses = data_responses | get_data(session=session, base_url=self.base_url, page=page)
+
+        return data_responses
 
     def get_XXXdata(self) -> dict:
         """Unused example."""
@@ -59,3 +62,30 @@ class RheemEziSETApi:
         return merged_response
 
 
+def get_data(
+        session: object,
+        base_url: str,
+        page: str,
+    ) -> dict:
+    """Get page, check for valid json responses then convert to dict format."""
+    if base_url == "":
+        LOGGER.error(f"{DOMAIN} - api attempted to retrieve an empty base_url.")
+        return None
+
+    elif page == "":
+        LOGGER.error(f"{DOMAIN} - api attempted to retrieve an empty base_url.")
+        return None
+
+    else:
+        url = base_url + page
+        response = session.get(url, verify=False)
+        LOGGER.debug(f"{DOMAIN} - {page} response: {response.text}")
+
+        if isinstance(response, object) and response.headers.get('content-type') == "application/json":
+            try:
+                data_response:  dict = response.json()
+            except Exception:
+                LOGGER.error(f"{DOMAIN} - couldn't convert response for {url} into json. Response was: {response.text}")
+            return data_response
+        else:
+            LOGGER.error(f"{DOMAIN} - received response for {url} but it doesn't appear to be json. Response: {response.text}")
