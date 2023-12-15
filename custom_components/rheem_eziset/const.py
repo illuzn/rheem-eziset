@@ -10,7 +10,6 @@ NAME = "Rheem EziSET Water Heater"
 IDPREFIX = "rheem_water_heater_"
 DOMAIN = "rheem_eziset"
 MANUFACTURER = "Rheem"
-VERSION = "2023.12.0"
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,

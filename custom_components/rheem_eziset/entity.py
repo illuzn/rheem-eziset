@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, NAME, MANUFACTURER, VERSION
+from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import RheemEziSETDataUpdateCoordinator
 
 class RheemEziSETEntity(CoordinatorEntity):
@@ -21,7 +21,6 @@ class RheemEziSETEntity(CoordinatorEntity):
             "identifiers": {(DOMAIN, self.coordinator.api.host)},
             "name": NAME,
             "manufacturer": MANUFACTURER,
-            "model": VERSION,
         }
 
     @property
