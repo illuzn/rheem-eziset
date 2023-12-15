@@ -31,7 +31,7 @@ class RheemEziSETApi:
             self,
             temp: int
             ):
-        """Set temperature"""
+        """Set temperature."""
         session = requests.Session()
 
         # Attempt to take control

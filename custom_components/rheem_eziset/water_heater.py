@@ -6,7 +6,7 @@ from homeassistant.components.water_heater import WaterHeaterEntity, WaterHeater
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature, CONF_HOST, PRECISION_WHOLE
 
 from .api import RheemEziSETApi
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
