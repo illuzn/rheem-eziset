@@ -10,7 +10,7 @@
 _Custom Component to integration to integrate [rheem_eziset][rheem_eziset] with Home Assistant._
 
 ## Notice
-This component is in a very early alpha stage. The main branch has functioning flow, mode and status sensors.
+This component is in a very early alpha stage. The main branch has functioning flow, mode, error, status and timeout sensors and a water heater control.
 
 This is very much a work in progress.
 
@@ -21,6 +21,8 @@ My documentation of the protocol is available here: https://illuzn.github.io/Rhe
 
 Entity | Description
 -- | --
+entity name prefixes | All entity names will be prefixed with the heaterName read from your device. This defaults to "Rheem" however you can use the app to change it to any 8 character alphanumeric identifier you want.
+`water_heater.water_heater` | Controls the water heater. It reads the min, current and max temps from your water heater. It also supports setting the target temperature to your desired value.
 `binary_sensor.heater_error` | Will be off for no error and on for an error. The error code will be provided in sensor.error_code (it is not known at this time  what the possible codes are)
 `sensor.flow` | The current flow rate of the water heater in L/min as reported by the water heater.
 `sensor.status` | The current status of the  water heater. Possible modes are: Idle, Heating, Bath Fill Complete (Off)
@@ -47,6 +49,10 @@ By default the sensors update every 15s. You can change this in the options, but
 ## Contributions are welcome!
 
 If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
+
+## Credits
+@ludeeus for the amazing [Integration Blueprint][https://github.com/ludeeus/integration_blueprint]
+@bajarrr for his work in deciphering the api.
 
 ## Intellectual Property
 Rheem and EZiSET are trademarks of Rheem Australia Pty Ltd in Australia and their respective owners worldwide. These trademarks are used on these pages under fair use and no affiliation or association with Rheem Australia Pty Ltd or any of its group companies is intended or to be inferred by the use of these marks.

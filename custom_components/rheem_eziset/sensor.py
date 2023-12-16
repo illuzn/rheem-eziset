@@ -4,25 +4,28 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass
 from homeassistant.helpers.entity import EntityCategory
-from homeassistant.const import TIME_MINUTES, TIME_SECONDS, VOLUME_LITERS, STATE_UNAVAILABLE
+from homeassistant.const import UnitOfTime, UnitOfVolume, STATE_UNAVAILABLE
 
-from .const import ICON_TAPON, ICON_TAPOFF, ICON_WATERHEATER, CONST_MODE_MAP, CONST_STATUS_MAP, DOMAIN, LOGGER
+from .const import ICON_RAW, ICON_TAPON, ICON_TAPOFF, ICON_TIMER, ICON_WATERHEATER, CONST_MODE_MAP, CONST_STATUS_MAP, DOMAIN, LOGGER
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Add sensors for passed config_entry in HA."""
     coordinator = hass.data[DOMAIN]
+    TIME_MINUTES = UnitOfTime.MINUTES
+    TIME_SECONDS = UnitOfTime.SECONDS
+    VOLUME_LITERS = UnitOfVolume.LITERS
 
     SENSOR_MAP = [
-        #("description",    "key",        "unit",                               "icon",             "device_class", "state_class",                  "entity_category"),
-        ("Flow",            "flow",        f"{VOLUME_LITERS}/{TIME_MINUTES}",   ICON_TAPON,         None,           SensorStateClass.MEASUREMENT,   None),
-        ("Status",          "state",       None,                                ICON_WATERHEATER,   None,           None,                           None),
-        ("Mode",            "mode",        None,                                ICON_WATERHEATER,   None,           None,                           None),
-        ("Status raw",      "state",       None,                                ICON_WATERHEATER,   None,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-        ("Mode raw",        "mode",        None,                                ICON_WATERHEATER,   None,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-        ("Heater error raw","appErrCode",  None,                                ICON_WATERHEATER,   None,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-        ("Session timeout", "sTimeout",    TIME_SECONDS,                        ICON_WATERHEATER,   SensorDeviceClass.DURATION,           SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        #("description",    "key",        "unit",                               "icon",             "device_class",             "state_class",                  "entity_category"),
+        ("Flow",            "flow",        f"{VOLUME_LITERS}/{TIME_MINUTES}",   ICON_TAPON,         None,                       SensorStateClass.MEASUREMENT,   None),
+        ("Status",          "state",       None,                                ICON_WATERHEATER,   None,                       None,                           None),
+        ("Mode",            "mode",        None,                                ICON_WATERHEATER,   None,                       None,                           None),
+        ("Status raw",      "state",       None,                                ICON_RAW,           None,                       SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        ("Mode raw",        "mode",        None,                                ICON_RAW,           None,                       SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        ("Heater error raw","appErrCode",  None,                                ICON_RAW,           None,                       SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
+        ("Session timeout", "sTimeout",    TIME_SECONDS,                        ICON_TIMER,         SensorDeviceClass.DURATION, SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
     ]
 
     sensors = [
