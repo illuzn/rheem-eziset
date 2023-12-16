@@ -2,7 +2,12 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.water_heater import WaterHeaterEntity, WaterHeaterEntityFeature, STATE_GAS, STATE_OFF
+from homeassistant.components.water_heater import (
+    WaterHeaterEntity,
+    WaterHeaterEntityFeature,
+    STATE_GAS,
+    STATE_OFF
+)
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature, CONF_HOST, PRECISION_WHOLE
 
 from .api import RheemEziSETApi
@@ -30,16 +35,16 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
             coordinator: RheemEziSETDataUpdateCoordinator,
             entry: ConfigEntry,
         ) -> None:
-            """Initialize the sensor."""
-            super().__init__(coordinator, entry)
-            self._attr_current_operation = STATE_GAS
-            self._attr_operation_list: [STATE_GAS, STATE_OFF]
-            self._attr_precision = PRECISION_WHOLE
-            self._attr_supported_features = WaterHeaterEntityFeature.TARGET_TEMPERATURE
-            self._attr_target_temperature = self.coordinator.data.get("tempMin")
-            self._attr_current_temperature = None
-            self._attr_has_entity_name = True
-            self.entry = entry
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        self._attr_current_operation = STATE_GAS
+        self._attr_operation_list: [STATE_GAS, STATE_OFF]
+        self._attr_precision = PRECISION_WHOLE
+        self._attr_supported_features = WaterHeaterEntityFeature.TARGET_TEMPERATURE
+        self._attr_target_temperature = self.coordinator.data.get("tempMin")
+        self._attr_current_temperature = None
+        self._attr_has_entity_name = True
+        self.entry = entry
 
     @property
     def name(self):
@@ -49,7 +54,7 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
     @property
     def unique_id(self):
         """Return a unique id."""
-        return f"{ConfigEntry.entry_id}-water-heater"
+        return f"{self.entry.entry_id}-water-heater"
 
     @property
     def extra_state_attributes(self):
@@ -103,7 +108,3 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
         temp = kwargs.get(ATTR_TEMPERATURE)
         self._attr_target_temperature = temp
         api.set_temp(temp)
-
-
-
-

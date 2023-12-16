@@ -9,14 +9,16 @@ from .const import DOMAIN, IDPREFIX
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
+BINARY_SENSOR_MAP = [
+    #("description", "key", "icon", "device_class", "entity_category"),
+    ("Heater error", "appErrCode", None, BinarySensorDeviceClass.PROBLEM, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
+]
+
 async def async_setup_entry(hass, entry, async_add_devices):
     """Add binary sensors for passed config_entry in HA."""
     coordinator = hass.data[DOMAIN]
 
-    BINARY_SENSOR_MAP = [
-        #("description",    "key",          "icon",             "device_class",                                  "entity_category"),
-        ("Heater error",    "appErrCode",   None,               BinarySensorDeviceClass.PROBLEM,                EntityCategory.DIAGNOSTIC),
-    ]
+
 
     binary_sensors = [
         RheemEziSETBinarySensor(
@@ -43,15 +45,15 @@ class RheemEziSETBinarySensor(RheemEziSETEntity):
             device_class: str,
             entity_category: str,
         ) -> None:
-            """Initialize the sensor."""
-            super().__init__(coordinator, entry)
-            self._id = f"{IDPREFIX}{id}"
-            self.description = description
-            self.key = key
-            self._icon = icon
-            self._device_class = device_class
-            self._entity_category = entity_category
-            self._attr_has_entity_name = True
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        self._id = f"{IDPREFIX}{id}"
+        self.description = description
+        self.key = key
+        self._icon = icon
+        self._device_class = device_class
+        self._entity_category = entity_category
+        self._attr_has_entity_name = True
 
     @property
     def state(self):
@@ -83,7 +85,7 @@ class RheemEziSETBinarySensor(RheemEziSETEntity):
     @property
     def unique_id(self):
         """Return a unique id."""
-        return f"{ConfigEntry.entry_id}-{self.description}"
+        return f"{self.entry.entry_id}-{self.description}"
 
     @property
     def entity_category(self):
@@ -98,13 +100,13 @@ class RheemEziSETProblemBinarySensor(RheemEziSETEntity):
             coordinator: RheemEziSETDataUpdateCoordinator,
             entry: ConfigEntry,
         ) -> None:
-            """Initialize the sensor."""
-            super().__init__(coordinator, entry)
-            self._id = f"{IDPREFIX}{id}"
-            self.description = "Connectivity Problem"
-            self._device_class = BinarySensorDeviceClass.CONNECTIVITY
-            self._entity_category = EntityCategory.DIAGNOSTIC
-            self._attr_has_entity_name = True
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        self._id = f"{IDPREFIX}{id}"
+        self.description = "Connectivity Problem"
+        self._device_class = BinarySensorDeviceClass.CONNECTIVITY
+        self._entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_has_entity_name = True
 
     @property
     def state(self) -> bool:
@@ -132,7 +134,7 @@ class RheemEziSETProblemBinarySensor(RheemEziSETEntity):
     @property
     def unique_id(self):
         """Return a unique id."""
-        return f"{ConfigEntry.entry_id}-connectivity-problem"
+        return f"{self.entry.entry_id}-connectivity-problem"
 
     @property
     def entity_category(self):

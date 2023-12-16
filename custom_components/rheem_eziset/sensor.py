@@ -6,31 +6,55 @@ from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.const import UnitOfTime, UnitOfVolume, STATE_UNAVAILABLE
 
-from .const import ICON_RAW, ICON_TAPON, ICON_TAPOFF, ICON_TIMER, ICON_WATERHEATER, CONST_MODE_MAP, CONST_STATUS_MAP, DOMAIN, LOGGER
+from .const import (
+    ICON_RAW,
+    ICON_TAPON,
+    ICON_TAPOFF,
+    ICON_TIMER,
+    ICON_WATERHEATER,
+    CONST_MODE_MAP,
+    CONST_STATUS_MAP,
+    DOMAIN,
+    LOGGER
+)
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
+
+TIME_MINUTES = UnitOfTime.MINUTES
+TIME_SECONDS = UnitOfTime.SECONDS
+VOLUME_LITERS = UnitOfVolume.LITERS
+
+SENSOR_MAP = [
+#("description", "key", "unit", "icon", "device_class", "state_class", "entity_category"), # pylint: disable=line-too-long
+("Flow", "flow", f"{VOLUME_LITERS}/{TIME_MINUTES}", ICON_TAPON, None, SensorStateClass.MEASUREMENT, None), # pylint: disable=line-too-long
+("Status", "state", None, ICON_WATERHEATER, None, None, None), # pylint: disable=line-too-long
+("Mode", "mode", None, ICON_WATERHEATER, None, None, None), # pylint: disable=line-too-long
+("Status raw", "state", None, ICON_RAW, None, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
+("Mode raw", "mode", None, ICON_RAW, None, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
+("Heater error raw", "appErrCode", None, ICON_RAW, None, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
+("Session timeout", "sTimeout", TIME_SECONDS, ICON_TIMER, SensorDeviceClass.DURATION, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
+
+]
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Add sensors for passed config_entry in HA."""
     coordinator = hass.data[DOMAIN]
-    TIME_MINUTES = UnitOfTime.MINUTES
-    TIME_SECONDS = UnitOfTime.SECONDS
-    VOLUME_LITERS = UnitOfVolume.LITERS
 
-    SENSOR_MAP = [
-        #("description",    "key",        "unit",                               "icon",             "device_class",             "state_class",                  "entity_category"),
-        ("Flow",            "flow",        f"{VOLUME_LITERS}/{TIME_MINUTES}",   ICON_TAPON,         None,                       SensorStateClass.MEASUREMENT,   None),
-        ("Status",          "state",       None,                                ICON_WATERHEATER,   None,                       None,                           None),
-        ("Mode",            "mode",        None,                                ICON_WATERHEATER,   None,                       None,                           None),
-        ("Status raw",      "state",       None,                                ICON_RAW,           None,                       SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-        ("Mode raw",        "mode",        None,                                ICON_RAW,           None,                       SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-        ("Heater error raw","appErrCode",  None,                                ICON_RAW,           None,                       SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-        ("Session timeout", "sTimeout",    TIME_SECONDS,                        ICON_TIMER,         SensorDeviceClass.DURATION, SensorStateClass.MEASUREMENT,   EntityCategory.DIAGNOSTIC),
-    ]
+
+
+
 
     sensors = [
         RheemEziSETSensor(
-            coordinator, entry, description, key, unit, icon, device_class, state_class, entity_category
+            coordinator,
+            entry,
+            description,
+            key,
+            unit,
+            icon,
+            device_class,
+            state_class,
+            entity_category
         )
         for description, key, unit, icon, device_class, state_class, entity_category in SENSOR_MAP
     ]
@@ -52,16 +76,16 @@ class RheemEziSETSensor(RheemEziSETEntity):
             state_class: str,
             entity_category: str,
         ) -> None:
-            """Initialize the sensor."""
-            super().__init__(coordinator, entry)
-            self.description = description
-            self.key = key
-            self.unit = unit
-            self._icon = icon
-            self._device_class = device_class
-            self._state_class = state_class
-            self._entity_category = entity_category
-            self._attr_has_entity_name = True
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        self.description = description
+        self.key = key
+        self.unit = unit
+        self._icon = icon
+        self._device_class = device_class
+        self._state_class = state_class
+        self._entity_category = entity_category
+        self._attr_has_entity_name = True
 
     @property
     def state(self):
@@ -73,8 +97,12 @@ class RheemEziSETSensor(RheemEziSETEntity):
                 if int(result) in CONST_STATUS_MAP:
                     return CONST_STATUS_MAP[int(result)][0]
                 return STATE_UNAVAILABLE
-            except Exception:
-                LOGGER.error(f"{DOMAIN} -  Unexpected result for status, result was {result}")
+            except Exception: # pylint: disable=broad-except
+                LOGGER.error(
+                    "%s -  Unexpected result for status, result was %s",
+                    DOMAIN,
+                    result
+                    )
                 return STATE_UNAVAILABLE
         elif self.description == "Mode":
             try:
@@ -82,8 +110,12 @@ class RheemEziSETSensor(RheemEziSETEntity):
                 if int(result) in CONST_MODE_MAP:
                     return CONST_MODE_MAP[int(result)][0]
                 return STATE_UNAVAILABLE
-            except Exception:
-                LOGGER.error(f"{DOMAIN} -  Unexpected result for mode, result was {result}")
+            except Exception: # pylint: disable=broad-except
+                LOGGER.error(
+                    "%s -  Unexpected result for mode, result was %s",
+                    DOMAIN,
+                    result
+                    )
         else:
             return result
 
@@ -102,7 +134,7 @@ class RheemEziSETSensor(RheemEziSETEntity):
                     return ICON_TAPON
                 else:
                     return ICON_TAPOFF
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 return  ICON_TAPOFF
         elif self.description == "Status":
             if int(result) in CONST_STATUS_MAP:
@@ -129,7 +161,7 @@ class RheemEziSETSensor(RheemEziSETEntity):
     @property
     def unique_id(self):
         """Return a unique id."""
-        return f"{ConfigEntry.entry_id}-{self.description}"
+        return f"{self.entry.entry_id}-{self.description}"
 
     @property
     def state_class(self):

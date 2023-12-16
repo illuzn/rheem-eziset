@@ -57,7 +57,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Validate host."""
         try:
             api = RheemEziSETApi(host=host)
-            await self.hass.async_add_executor_job(api.getInfo_data)
+            await self.hass.async_add_executor_job(api.get_data)
             return True
         except Exception as ex: # pylint: disable=broad-except
             LOGGER.error(
