@@ -10,7 +10,7 @@ NAME = "Rheem EziSET Water Heater"
 IDPREFIX = "rheem_water_heater_"
 DOMAIN = "rheem_eziset"
 MANUFACTURER = "Rheem"
-VERSION = "2023.12.1"
+VERSION = "2023.12.2"
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
@@ -45,4 +45,3 @@ ICON_TAPON = "mdi:water-pump"
 ICON_TAPOFF = "mdi:water-pump-off"
 ICON_TIMER = "mdi:timer"
 ICON_WATERHEATER = "mdi:water-boiler"
-
