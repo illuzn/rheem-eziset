@@ -13,6 +13,7 @@ class RheemEziSETEntity(CoordinatorEntity):
         """Initialise the entity."""
         super().__init__(coordinator)
         self.entry = entry
+        self.counter_update_fails = 0
 
     @property
     def device_info(self):
@@ -26,8 +27,20 @@ class RheemEziSETEntity(CoordinatorEntity):
 
     @property
     def available(self) -> bool:
-        """Returns the availability of the device. Assume True if there is data."""
-        return not not self.coordinator.data
+        """Returns the availability of the device."""
+        test = self.coordinator.last_update_success
+
+        # Unavailable if 5 successive requests failed
+        if self.counter_update_fails >= 4 and test == False:
+            return test
+        # If successful reset the counter and mark available
+        if test == True:
+            self.counter_update_fails = 0
+            return test
+        # Otherwise increment counter and try again on next scheduled update
+        else:
+            self.counter_update_fails += 1
+            return True
 
     @property
     def should_poll(self) -> bool:
