@@ -2,10 +2,12 @@
 import time
 import requests
 
+from homeassistant.exceptions import ConditionErrorMessage
+
 from .const import LOGGER, DOMAIN
 
 class RheemEziSETApi:
-    """This class defines the Rheem EziSET API."""
+    """Define the Rheem EziSET API."""
 
     def __init__(self, host: str) -> None:
         """Initialise the basic parameters."""
@@ -34,18 +36,40 @@ class RheemEziSETApi:
         """Set temperature."""
         session = requests.Session()
 
+        # Check for issues taking control.
+        page = "getInfo.cgi"
+        result = self.get_responses(session=session,page=page)
+        if (
+            result.get("sTimeout") != 0 or
+            result.get("mode") != 5 or
+            float(result.get("flow")) != 0
+        ):
+            raise ConditionErrorMessage(
+                type="invalid",
+                message=f"Couldn't take control. Got this response: {result}"
+            )
+
+        # Check for invalid settings
+        page = "getParams.cgi"
+        result = self.get_responses(session=session,page=page)
+        mintemp = result.get("minTemp", 37)
+        maxtemp = result.get("maxTemp", 50)
+        if (
+            temp < int(mintemp) or
+            temp > int (maxtemp)
+        ):
+            raise ConditionErrorMessage(
+                type="invalid temperature",
+                message=f"An invalid temperature ({temp}) was attempted to be set."
+            )
+
         # Attempt to take control
         page = "ctrl.cgi?sid=0&heatingCtrl=1"
-
         sid = 0
-        loops = 0
-
         data_response = self.get_responses(session=session,page=page)
-        sid = data_response.get("sid", 0)
-        loops += 1
-
+        sid = data_response.get("sid")
         result = data_response.get("heatingCtrl")
-        if result != 1:
+        if result != 1 or sid == 0 or sid is None:
             # Something wrong happened. Log error and hand back control.
             LOGGER.error(
                 "%s - Error when retrieving %s. Result was: %s",
@@ -96,7 +120,6 @@ class RheemEziSETApi:
             page: str,
         ) -> dict:
         """Get page, check for valid json responses then convert to dict format."""
-
         base_url = self.base_url
         if base_url == "":
             LOGGER.error("%s - api attempted to retrieve an empty base_url.", DOMAIN)

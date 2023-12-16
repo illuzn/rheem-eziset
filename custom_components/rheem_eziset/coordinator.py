@@ -21,7 +21,7 @@ class RheemEziSETDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> None:
         """Initialize."""
         self.api = api
-        self.platforms =[]
+        self.platforms = []
 
         super().__init__(
             hass=hass,

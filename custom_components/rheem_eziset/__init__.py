@@ -1,4 +1,5 @@
-"""Custom integration to integrate rheem_eziset with Home Assistant.
+"""
+Custom integration to integrate rheem_eziset with Home Assistant.
 
 For more details about this integration, please refer to
 https://github.com/illuzn/rheem-eziset/

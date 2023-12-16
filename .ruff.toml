@@ -27,6 +27,9 @@ select = [
 ]
 
 ignore = [
+
+    "D203", # One blank line before class
+    "D212", # Multi line summary first line
     "E501",  # line too long
 ]
 
