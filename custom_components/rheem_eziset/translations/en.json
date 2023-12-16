@@ -13,7 +13,7 @@
             "connection": "Unable to connect to the device."
         },
         "abort": {
-            "single_instance_allowed": "Only a single instance is allowed."
+            "host_already_exists": "Error. This host has already been configured."
         }
     },
     "options": {

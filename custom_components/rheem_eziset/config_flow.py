@@ -1,8 +1,8 @@
 """Adds config flow for Rheem EziSET."""
 from __future__ import annotations
 
-import voluptuous as vol
 import traceback
+import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import callback
@@ -28,8 +28,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Don't allow duplicates
             current_entries = self._async_current_entries()
-            if user_input[CONF_HOST] in current_entries:
-                return self.async_abort(reason="host_already_exists")
+            for entry in current_entries:
+                if user_input[CONF_HOST] == entry.title:
+                    return self.async_abort(reason="host_already_exists")
 
             # Test connectivity
             valid = await self._test_host(user_input[CONF_HOST])
