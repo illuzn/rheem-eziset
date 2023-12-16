@@ -40,7 +40,9 @@ CONST_STATUS_MAP = {
 }
 
 # Icon Dictionary
+ICON_RAW = "mdi:raw"
 ICON_TAPON = "mdi:water-pump"
 ICON_TAPOFF = "mdi:water-pump-off"
+ICON_TIMER = "mdi:timer"
 ICON_WATERHEATER = "mdi:water-boiler"
 
