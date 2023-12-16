@@ -14,6 +14,7 @@ class RheemEziSETEntity(CoordinatorEntity):
         super().__init__(coordinator)
         self.entry = entry
         self.counter_update_fails = 0
+        self.coordinator.problem_flag = False
 
     @property
     def device_info(self):
@@ -31,11 +32,13 @@ class RheemEziSETEntity(CoordinatorEntity):
         test = self.coordinator.last_update_success
 
         # Unavailable if 5 successive requests failed
-        if self.counter_update_fails >= 4 and test == False:
+        if self.counter_update_fails >= 4 and test is False:
+            self.coordinator.problem_flag = True
             return test
         # If successful reset the counter and mark available
-        if test == True:
+        if test is True:
             self.counter_update_fails = 0
+            self.coordinator.problem_flag = False
             return test
         # Otherwise increment counter and try again on next scheduled update
         else:
