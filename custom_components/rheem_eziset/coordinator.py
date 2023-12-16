@@ -33,6 +33,8 @@ class RheemEziSETDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update basic data via client."""
         try:
-            return await self.hass.async_add_executor_job(self.api.getInfo_data)
+            result =  await self.hass.async_add_executor_job(self.api.getInfo_data)
+            LOGGER.info(f"{DOMAIN} - Final getInfo_data result: {result}")
+            return result
         except Exception as exception:
             raise UpdateFailed() from exception
