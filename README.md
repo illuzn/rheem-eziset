@@ -34,6 +34,13 @@ entity name prefixes | All entity names will be prefixed with the heaterName rea
 
 ## Installation
 
+### HACS
+
+1. In HACS, go to Integrations and add this repository `https://github.com/illuzn/rheem-eziset` as an Integration.
+2. Press Explore & Download Repositories and download Rheem Eziset.
+
+### Manual Installation
+
 1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 1. If you do not have a `custom_components` directory (folder) there, you need to create it.
 1. In the `custom_components` directory (folder) create a new folder called `rheem_eziset`.
@@ -44,7 +51,7 @@ entity name prefixes | All entity names will be prefixed with the heaterName rea
 
 ## Configuration is done in the UI
 
-By default the sensors update every 15s. You can change this in the options, but be warned, if you perform too many requests per second your device will assume its under a DoS attack and refuse all connections.
+By default the sensors update every 5s. You can change this in the options, but be warned, if you perform too many requests per second your device will assume its under a DoS attack and refuse all connections. If your device has a poor connection i.e. heater and powerline unit are too far apart you may need to reduce this number - a symptom of this will be the ability to initially connect but not getting updated data over time.
 
 ## Contributions are welcome!
 
