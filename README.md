@@ -36,8 +36,7 @@ entity name prefixes | All entity names will be prefixed with the heaterName rea
 
 ### HACS
 
-1. In HACS, go to Integrations and add this repository `https://github.com/illuzn/rheem-eziset` as an Integration.
-2. Press Explore & Download Repositories and download Rheem Eziset.
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=illuzn&repository=rheem-eziset&category=integration)
 
 ### Manual Installation
 
