@@ -58,8 +58,9 @@ By default the sensors update every 5s. You can change this in the options, but 
 If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
 
 ## Credits
-@ludeeus for the amazing [Integration Blueprint][https://github.com/ludeeus/integration_blueprint]
-@bajarrr for his work in deciphering the api.
+[ludeeus](https://github.com/ludeeus) for the amazing [Integration Blueprint](https://github.com/ludeeus/integration_blueprint)
+
+[bajarrr](https://github.com/bajarrr) for his work in deciphering the api.
 
 ## Intellectual Property
 Rheem and EZiSET are trademarks of Rheem Australia Pty Ltd in Australia and their respective owners worldwide. These trademarks are used on these pages under fair use and no affiliation or association with Rheem Australia Pty Ltd or any of its group companies is intended or to be inferred by the use of these marks.
