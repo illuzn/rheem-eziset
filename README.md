@@ -73,6 +73,6 @@ Rheem and EZiSET are trademarks of Rheem Australia Pty Ltd in Australia and thei
 [commits-shield]: https://img.shields.io/github/commit-activity/y/illuzn/rheem-eziset.svg?style=for-the-badge
 [commits]: https://github.com/illuzn/rheem-eziset/commits/main
 [license-shield]: https://img.shields.io/github/license/illuzn/rheem-eziset.svg?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/badge/maintainer-%40ludeeus-blue.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/badge/maintainer-%40illuzn-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/illuzn/rheem-eziset.svg?style=for-the-badge
 [releases]: https://github.com/illuzn/rheem-eziset/releases
