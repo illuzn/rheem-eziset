@@ -104,7 +104,7 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
     @property
     def target_temperature(self):
         """Return the target temperature or the current temperature if there is no target."""
-        return self._rheem_target_temperature or self._rheem_current_temperature
+        return self._rheem_current_temperature
 
     def set_temperature(self, **kwargs):
         """Set the target temperature of the water heater."""
