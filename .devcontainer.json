@@ -17,8 +17,7 @@
                 "visualstudioexpteam.vscodeintellicode",
                 "github.vscode-pull-request-github",
                 "ryanluker.vscode-coverage-gutters",
-                "ms-python.vscode-pylance",
-                "rogalmic.bash-debug"
+                "ms-python.vscode-pylance"
             ],
             "settings": {
                 "files.eol": "\n",
