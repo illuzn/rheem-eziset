@@ -10,12 +10,16 @@
 _Custom Component to integration to integrate [rheem_eziset][rheem_eziset] with Home Assistant._
 
 ## Notice
-This component is in a very early alpha stage. The main branch has functioning flow, mode, error, status and timeout sensors and a water heater control.
-
-This is very much a work in progress.
+This component is in a release candidate stage. The released package has been tested by at least the author. The main branch should be considered beta branch. The dev branch is experimental and may break at any time.
 
 ## Protocol
 My documentation of the protocol is available here: https://illuzn.github.io/Rheem-Eziset-Protocol/
+
+## Warning
+While this integration does not allow you to do anything which the app lets you do. Using this integration makes it easier to set your hot water temperature (and also inadvertently set it incorrectly). While 50C meets Australian Standards for hot water, you should be aware of the following:
+- Hot water temperature will vary depending on how close/ far the outlet you are using is. Your installer should have tested the temperature at the closest outlet to the heater (but my installer didn't do this).
+- There are internal dip switches inside your water heater that offset the read temperature by +/-3C. This means that a setting of 50C may actually be 53C (which is outside the guidelines). The installer manual is available online.
+- I strongly recommend setting up an automation to restore your water heater to a default low setting to avoid the risk of inadvertent burns/ scalding. Remember, not everyone in your house knows that you have set the hot water to piping hot (and this may especially be an issue with young children or the elderly).
 
 **This integration will set up the following entities.**
 
