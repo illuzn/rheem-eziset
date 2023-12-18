@@ -6,3 +6,15 @@ logger:
   default: error
   logs:
     custom_components.rheem_eziset: debug
+
+input_button:
+  shutdown:
+    name: "Shutdown Home Assistant"
+    icon: "mdi:power-plug-off-outline"
+
+automation shutdown:
+  trigger:
+    - platform: state
+      entity_id: input_button.shutdown
+  action:
+    - service: homeassistant.stop
