@@ -37,7 +37,7 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
         ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, entry)
-        self._attr_current_operation = STATE_GAS
+        self._attr_current_operation = STATE_OFF
         self._attr_operation_list: [STATE_GAS, STATE_OFF]
         self._attr_precision = PRECISION_WHOLE
         self._attr_supported_features = WaterHeaterEntityFeature.TARGET_TEMPERATURE
@@ -77,7 +77,11 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
     @property
     def current_operation(self):
         """Return the state of the sensor."""
-        return STATE_GAS
+        mode = self.coordinator.data.get("mode")
+        if mode == 15 or mode == 25:
+            return STATE_GAS
+        else:
+            return STATE_OFF
 
     @property
     def supported_features(self):
