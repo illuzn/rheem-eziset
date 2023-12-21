@@ -3,6 +3,7 @@ import time
 import requests
 
 from homeassistant.exceptions import ConditionErrorMessage
+from homeassistant.components.water_heater import WaterHeaterEntity
 
 from .const import LOGGER, DOMAIN
 
@@ -31,7 +32,7 @@ class RheemEziSETApi:
 
     def set_temp(
             self,
-            water_heater: object,
+            water_heater: WaterHeaterEntity,
             temp: int
             ):
         """Set temperature."""
@@ -68,18 +69,19 @@ class RheemEziSETApi:
                     message=f"""{DOMAIN} - Couldn't take control - it appears another user has control.
                     Got this response: {result}"""
                 )
-            elif result.get("mode") != 5:
+            elif result.get("mode") in [10, 20, 25, 30]:
                 raise ConditionErrorMessage(
                     type="invalid_mode",
-                    message=f"""{DOMAIN} - Couldn't take control - it appears that the water_heater is in use.
+                    message=f"""{DOMAIN} - Couldn't take control - it appears that the water_heater is in use or another user has control.
                     Got this response: {result}"""
                 )
-            elif float(result.get("flow")) != 0:
+            elif result.get("mode") == 15 and temp > water_heater.current_temperature and temp > 43:
                 raise ConditionErrorMessage(
-                    type="invalid_flow",
-                    message=f"""{DOMAIN} - Couldn't take control - it appears that the water_heater is in use.
-                    Got this response: {result}"""
+                    type="invalid_temperature",
+                    message=f"""{DOMAIN} - Invalid temperature. You cannot increase the temperature above 43 degrees while the water_heater is in use.
+                    Got this temp: {temp}. Got this response: {result}"""
                 )
+
 
             # Attempt to take control
             page = "ctrl.cgi?sid=0&heatingCtrl=1"
