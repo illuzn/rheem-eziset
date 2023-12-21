@@ -18,7 +18,7 @@
     },
     "options": {
         "step": {
-            "user": {
+            "init": {
                 "title": "Rheem Eziset Configuration",
                 "description": "Please provide a scan interval to update the sensors. Warning: Read the documentation before changing this.",
                 "data": {

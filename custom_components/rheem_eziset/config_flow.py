@@ -73,17 +73,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_entry: config_entries.ConfigEntries
         ) -> config_entries.OptionsFlow:
         """Create the options flow."""
-        return OptionsFlow(config_entry)
+        return OptionsFlowHandler(config_entry)
 
-class OptionsFlow(config_entries.OptionsFlow):
+class OptionsFlowHandler(config_entries.OptionsFlow):
     """Options flow for Rheem EziSET."""
 
-    def __init__(self, config_entry):
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialise the options flow."""
         self.config_entry = config_entry
-        self.options = dict(config_entry.options)
 
-    async def async_step_init(self, user_input = None):
+    async def async_step_init(self, user_input):
         """Handle an option flow."""
         config = {**self.config_entry.data, **self.config_entry.options}
 
@@ -92,7 +91,7 @@ class OptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(
-            step_id="user",
+            step_id="init",
             data_schema=vol.Schema(
                 {
                     vol.Optional(
