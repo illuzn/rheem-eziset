@@ -22,8 +22,7 @@
                 "title": "Rheem Eziset Configuration",
                 "description": "Please provide a scan interval to update the sensors. Warning: Read the documentation before changing this.",
                 "data": {
-                    "scan_interval": "Sensor scan interval in seconds (Default: 15)",
-                    "config_scan_interval": "Config scan interval in seconds (Default: 60)"
+                    "scan_interval": "Sensor scan interval in seconds (Default: 5)"
                 }
             }
         }
