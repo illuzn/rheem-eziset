@@ -119,3 +119,4 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
         temp = kwargs.get(ATTR_TEMPERATURE)
         self.rheem_target_temperature = temp
         api.set_temp(water_heater=self, temp=temp)
+        self.rheem_current_temperature = None
