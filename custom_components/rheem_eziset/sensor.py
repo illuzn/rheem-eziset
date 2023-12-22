@@ -2,15 +2,17 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass
+from homeassistant.components.sensor import SensorEntity, SensorStateClass, SensorDeviceClass
 from homeassistant.helpers.entity import EntityCategory
-from homeassistant.const import UnitOfTime, UnitOfVolume, STATE_UNAVAILABLE
+from homeassistant.const import UnitOfTime, UnitOfVolume, STATE_UNAVAILABLE, UnitOfTemperature
 
 from .const import (
+    ICON_NAME,
     ICON_RAW,
     ICON_TAPON,
     ICON_TAPOFF,
     ICON_TIMER,
+    ICON_TEMP,
     ICON_WATERHEATER,
     CONST_MODE_MAP,
     CONST_STATUS_MAP,
@@ -23,17 +25,20 @@ from .entity import RheemEziSETEntity
 TIME_MINUTES = UnitOfTime.MINUTES
 TIME_SECONDS = UnitOfTime.SECONDS
 VOLUME_LITERS = UnitOfVolume.LITERS
+CELSIUS = UnitOfTemperature.CELSIUS
 
 SENSOR_MAP = [
-#("description", "key", "unit", "icon", "device_class", "state_class", "entity_category"), # pylint: disable=line-too-long
-("Flow", "flow", f"{VOLUME_LITERS}/{TIME_MINUTES}", ICON_TAPON, None, SensorStateClass.MEASUREMENT, None), # pylint: disable=line-too-long
-("Status", "state", None, ICON_WATERHEATER, None, None, None), # pylint: disable=line-too-long
-("Mode", "mode", None, ICON_WATERHEATER, None, None, None), # pylint: disable=line-too-long
-("Status raw", "state", None, ICON_RAW, None, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
-("Mode raw", "mode", None, ICON_RAW, None, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
-("Heater error raw", "appErrCode", None, ICON_RAW, None, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
-("Session timeout", "sTimeout", TIME_SECONDS, ICON_TIMER, SensorDeviceClass.DURATION, SensorStateClass.MEASUREMENT, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
-
+#("description",        "key",          "unit",                             "icon",             "device_class",                         "state_class",                      "entity_category",              "enabled_default"), # pylint: disable=line-too-long
+("Flow",                "flow",         f"{VOLUME_LITERS}/{TIME_MINUTES}",  ICON_TAPON,         None,                                   SensorStateClass.MEASUREMENT,       None,                           True), # pylint: disable=line-too-long
+("Status",              "state",        None,                               ICON_WATERHEATER,   None,                                   None,                               None,                           True), # pylint: disable=line-too-long
+("Mode",                "mode",         None,                               ICON_WATERHEATER,   None,                                   None,                               None,                           True), # pylint: disable=line-too-long
+("Status raw",          "state",        None,                               ICON_RAW,           None,                                   SensorStateClass.MEASUREMENT,       EntityCategory.DIAGNOSTIC,      False), # pylint: disable=line-too-long
+("Mode raw",            "mode",         None,                               ICON_RAW,           None,                                   SensorStateClass.MEASUREMENT,       EntityCategory.DIAGNOSTIC,      False), # pylint: disable=line-too-long
+("Heater error raw",    "appErrCode",   None,                               ICON_RAW,           None,                                   SensorStateClass.MEASUREMENT,       EntityCategory.DIAGNOSTIC,      False), # pylint: disable=line-too-long
+("Session timeout",     "sTimeout",     TIME_SECONDS,                       ICON_TIMER,         None,                                   SensorStateClass.MEASUREMENT,       EntityCategory.DIAGNOSTIC,      True), # pylint: disable=line-too-long
+("Current Temperature", "temp",         CELSIUS,                            ICON_TEMP,          SensorDeviceClass.TEMPERATURE,          SensorStateClass.MEASUREMENT,       EntityCategory.DIAGNOSTIC,      False), # pylint: disable=line-too-long
+("Heater Name",         "heaterName",   None,                               ICON_NAME,          None,                                   None,                               EntityCategory.DIAGNOSTIC,      False), # pylint: disable=line-too-long
+("Heater Model",        "heaterModel",  None,                               ICON_NAME,          None,                                   None,                               EntityCategory.DIAGNOSTIC,      False), # pylint: disable=line-too-long
 ]
 
 async def async_setup_entry(hass, entry, async_add_devices):
@@ -54,14 +59,15 @@ async def async_setup_entry(hass, entry, async_add_devices):
             icon,
             device_class,
             state_class,
-            entity_category
+            entity_category,
+            enabled_default
         )
-        for description, key, unit, icon, device_class, state_class, entity_category in SENSOR_MAP
+        for description, key, unit, icon, device_class, state_class, entity_category, enabled_default in SENSOR_MAP  # pylint: disable=line-too-long
     ]
 
     async_add_devices(sensors, True)
 
-class RheemEziSETSensor(RheemEziSETEntity):
+class RheemEziSETSensor(RheemEziSETEntity, SensorEntity):
     """rheem_eziset Sensor class."""
 
     def __init__(
@@ -75,22 +81,26 @@ class RheemEziSETSensor(RheemEziSETEntity):
             device_class: str,
             state_class: str,
             entity_category: str,
+            enabled_default: bool,
         ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, entry)
         self.description = description
         self.key = key
-        self.unit = unit
+        self._attr_native_unit_of_measurement = unit
         self._icon = icon
         self._device_class = device_class
         self._state_class = state_class
-        self._entity_category = entity_category
+        self._attr_entity_category = entity_category
         self._attr_has_entity_name = True
+        self._attr_entity_registry_enabled_default = enabled_default
+        if description == "Flow":
+            self._attr_suggested_display_precision = 1
 
     @property
-    def state(self):
-        """Return the state of the sensor."""
-        result = self.coordinator.data.get(self.key, STATE_UNAVAILABLE)
+    def native_value(self):
+        """Return the native_value of the sensor."""
+        result = self.coordinator.data.get(self.key, None)
         if self.description == "Status":
             try:
                 result = int(result)
@@ -120,11 +130,6 @@ class RheemEziSETSensor(RheemEziSETEntity):
             return result
 
     @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement of the sensor."""
-        return self.unit
-
-    @property
     def icon(self):
         """Return the icon with processing in the case of some sensors."""
         result = self.coordinator.data.get(self.key, STATE_UNAVAILABLE)
@@ -147,28 +152,12 @@ class RheemEziSETSensor(RheemEziSETEntity):
         else:
             return self._icon
 
-
-    @property
-    def device_class(self):
-        """Return the device class."""
-        return self._device_class
-
-    @property
-    def name(self):
-        """Return the sensor name."""
-        return self.description
-
     @property
     def unique_id(self):
-        """Return a unique id."""
+        """Return the unique id."""
         return f"{self.entry.entry_id}-{self.description}"
 
     @property
-    def state_class(self):
-        """Return the sensor state class."""
-        return self._state_class
-
-    @property
-    def entity_category(self):
-        """Return the entity category."""
-        return self._entity_category
+    def name(self):
+        """Return the name."""
+        return self.description
