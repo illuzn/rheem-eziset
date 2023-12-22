@@ -33,6 +33,7 @@ entity name prefixes | | All entity names will be prefixed with the heaterName r
 `sensor.status` | True | The current status of the  water heater. Possible modes are: Idle, Heating, Bath Fill Complete (Off)
 `sensor.mode` | True | The current mode of the water heater. Possible modes are: Idle, Heating Control Mode, Heating (Conventional Mode), Idle (Bath Fill Mode Waiting for Tap), Heating (Bath Fill Mode), Idle (Bath Fill Mode Complete)
 `sensor.session_timeout` | True | The time in seconds until the current user's session times out. This will only apply if there is a communication error with the water heater or if somebody is using the app or a physical device in the house to control the water heater. You are locked out of controls while someone else is in control.
+`number.session_timeout` | True | Configures the default session timeout. It is recommended to set the session time out to the lowest permitted value of 60. In the future, this will be used to attempt to maintain a persistent control session (and enable changing temperature while the heater is active).
 `sensor.status_raw` | False | The raw status code provided by the water heater. Known status codes are 1, 2, 3.
 `sensor.mode_raw` | False | The raw mode code provided by the water heater. Known mode codes are 5, 10, 15, 20, 25, 35.
 `sensor.heater_error_raw` | False | The raw heater error code provided by the water heater. 0 is normal but the other codes are unknown.
