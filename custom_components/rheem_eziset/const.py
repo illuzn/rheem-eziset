@@ -14,7 +14,8 @@ VERSION = "2023.12.2"
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
-#    Platform.NUMBER,
+    Platform.NUMBER,
+#   Platform.SWITCH
     Platform.WATER_HEATER,
 ]
 
