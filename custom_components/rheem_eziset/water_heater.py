@@ -44,8 +44,8 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
         self._attr_target_temperature = self.coordinator.data.get("tempMin")
         self._attr_current_temperature = None
         self._attr_has_entity_name = True
-        self._rheem_target_temperature = self.coordinator.data.get("temp")
-        self._rheem_current_temperature = self.coordinator.data.get("temp")
+        self.rheem_target_temperature = self.coordinator.data.get("temp")
+        self.rheem_current_temperature = self.coordinator.data.get("temp")
         self.entry = entry
 
     @property
@@ -102,18 +102,20 @@ class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
     def current_temperature(self):
         """Return the current temperature ."""
         result = self.coordinator.data.get("temp")
-        self._rheem_current_temperature = result
+        self.rheem_current_temperature = result
         return self.coordinator.data.get("temp")
 
     @property
     def target_temperature(self):
         """Return the target temperature or the current temperature if there is no target."""
-        return self._rheem_current_temperature
+        if self.rheem_current_temperature is not None:
+            return self.rheem_current_temperature
+        else:
+            return self.current_temperature
 
     def set_temperature(self, **kwargs):
         """Set the target temperature of the water heater."""
         api = RheemEziSETApi(host=self.entry.data.get(CONF_HOST))
         temp = kwargs.get(ATTR_TEMPERATURE)
-        self._rheem_target_temperature = temp
+        self.rheem_target_temperature = temp
         api.set_temp(water_heater=self, temp=temp)
-        self._rheem_target_temperature = None

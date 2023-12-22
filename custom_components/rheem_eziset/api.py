@@ -42,17 +42,20 @@ class RheemEziSETApi:
         maxtemp = water_heater.max_temp
 
         if temp is None:
+            water_heater.rheem_target_temperature = None
             raise ConditionErrorMessage(
                 type="invalid_temperature",
                 message="{DOMAIN} - No temperature was set. Ignoring call to set temperature."
             )
         elif temp < int(mintemp):
+            water_heater.rheem_target_temperature = None
             raise ConditionErrorMessage(
                 type="minimum_temperature",
                 message= f"""{DOMAIN} - An invalid temperature ({temp}) was attempted to be set.
                 This is below the minimum temperature ({mintemp})."""
             )
         elif temp > int (maxtemp):
+            water_heater.rheem_target_temperature = None
             raise ConditionErrorMessage(
                 type="maximum_temperature",
                 message=f"""{DOMAIN} - An invalid temperature ({temp}) was attempted to be set.
@@ -63,18 +66,21 @@ class RheemEziSETApi:
             page = "getInfo.cgi"
             result = self.get_responses(session=session,page=page)
             if result.get("sTimeout") != 0:
+                water_heater.rheem_target_temperature = None
                 raise ConditionErrorMessage(
                     type="invalid_sTimeout",
                     message=f"""{DOMAIN} - Couldn't take control - it appears another user has control.
                     Got this response: {result}"""
                 )
             elif result.get("mode") != 5:
+                water_heater.rheem_target_temperature = None
                 raise ConditionErrorMessage(
                     type="invalid_mode",
                     message=f"""{DOMAIN} - Couldn't take control - it appears that the water_heater is in use.
                     Got this response: {result}"""
                 )
             elif float(result.get("flow")) != 0:
+                water_heater.rheem_target_temperature = None
                 raise ConditionErrorMessage(
                     type="invalid_flow",
                     message=f"""{DOMAIN} - Couldn't take control - it appears that the water_heater is in use.
@@ -137,7 +143,12 @@ class RheemEziSETApi:
                     page,
                     data_response
                     )
-
+    def set_session_timer(
+            self,
+            session_timer: float,
+    ):
+        """Set session timer."""
+        return
     def get_responses(
             self,
             session: object,
