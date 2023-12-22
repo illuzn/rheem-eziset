@@ -1,9 +1,7 @@
 {
   "domain": "rheem_eziset",
   "name": "Rheem EziSET",
-  "codeowners": [
-    "@illuzn"
-  ],
+  "codeowners": ["@illuzn"],
   "config_flow": true,
   "documentation": "https://github.com/illuzn/rheem-eziset",
   "integration_type": "device",

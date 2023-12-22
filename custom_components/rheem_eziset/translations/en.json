@@ -1,30 +1,30 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Rheem Eziset Host",
-                "description": "Please provide the local IPv4 address of your Rheem EziSET water heater.",
-                "data": {
-                    "host": "0.0.0.0"
-                }
-            }
-        },
-        "error": {
-            "connection": "Unable to connect to the device."
-        },
-        "abort": {
-            "host_already_exists": "Error. This host has already been configured."
+  "config": {
+    "step": {
+      "user": {
+        "title": "Rheem Eziset Host",
+        "description": "Please provide the local IPv4 address of your Rheem EziSET water heater.",
+        "data": {
+          "host": "0.0.0.0"
         }
+      }
     },
-    "options": {
-        "step": {
-            "init": {
-                "title": "Rheem Eziset Configuration",
-                "description": "Please provide a scan interval to update the sensors. Warning: Read the documentation before changing this.",
-                "data": {
-                    "scan_interval": "Sensor scan interval in seconds (Default: 5)"
-                }
-            }
-        }
+    "error": {
+      "connection": "Unable to connect to the device."
+    },
+    "abort": {
+      "host_already_exists": "Error. This host has already been configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Rheem Eziset Configuration",
+        "description": "Please provide a scan interval to update the sensors. Warning: Read the documentation before changing this.",
+        "data": {
+          "scan_interval": "Sensor scan interval in seconds (Default: 5)"
+        }
+      }
+    }
+  }
 }

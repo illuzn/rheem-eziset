@@ -6,6 +6,20 @@
             "type": "shell",
             "command": "scripts/develop",
             "problemMatcher": []
-        }
+        },
+        {
+            "label": "Pre-commmit all",
+            "type": "shell",
+            "command": "pre-commit run --all-files",
+            "group": {
+              "kind": "test",
+              "isDefault": true
+            },
+            "presentation": {
+              "reveal": "always",
+              "panel": "new"
+            },
+            "problemMatcher": []
+          }
     ]
 }

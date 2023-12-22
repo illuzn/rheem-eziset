@@ -13,26 +13,24 @@ from .const import DOMAIN, ICON_TIMER
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
+
 async def async_setup_entry(hass, entry, async_add_devices):
     """Add water heater for passed config_entry in HA."""
     coordinator = hass.data[DOMAIN]
 
-    number = [
-        RheemEziSETNumber(
-            coordinator, entry
-        )
-    ]
+    number = [RheemEziSETNumber(coordinator, entry)]
 
     async_add_devices(number, True)
+
 
 class RheemEziSETNumber(RheemEziSETEntity, NumberEntity):
     """rheem_eziset Number class."""
 
     def __init__(
-            self,
-            coordinator: RheemEziSETDataUpdateCoordinator,
-            entry: ConfigEntry,
-        ) -> None:
+        self,
+        coordinator: RheemEziSETDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
         """Initialize the number."""
         super().__init__(coordinator, entry)
         self._attr_has_entity_name = True
@@ -55,7 +53,7 @@ class RheemEziSETNumber(RheemEziSETEntity, NumberEntity):
         else:
             return self.coordinator.data.get("sessionTimer")
 
-    def set_native_value (self, value: float) -> None:
+    def set_native_value(self, value: float) -> None:
         """Set the session timer of the water heater."""
         api = RheemEziSETApi(host=self.entry.data.get(CONF_HOST))
         session_timer = self.rheem_session_timer = value

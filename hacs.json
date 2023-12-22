@@ -1,5 +1,5 @@
 {
-    "name": "Rheem EziSET",
-    "homeassistant": "2023.8.0",
-    "render_readme": true
+  "name": "Rheem EziSET",
+  "homeassistant": "2023.8.0",
+  "render_readme": true
 }

@@ -6,6 +6,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import RheemEziSETDataUpdateCoordinator
 
+
 class RheemEziSETEntity(CoordinatorEntity):
     """Basic entity definition used by all entities."""
 
@@ -23,7 +24,7 @@ class RheemEziSETEntity(CoordinatorEntity):
             "identifiers": {(DOMAIN, self.coordinator.api.host)},
             "name": self.coordinator.data.get("heaterName", NAME),
             "manufacturer": MANUFACTURER,
-            "sw_version": self.coordinator.data.get("FWversion")
+            "sw_version": self.coordinator.data.get("FWversion"),
         }
 
     @property

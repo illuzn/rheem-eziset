@@ -11,6 +11,7 @@ from homeassistant.const import CONF_HOST
 from .const import DOMAIN, LOGGER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
 from .api import RheemEziSETApi
 
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for rheem_eziset."""
 
@@ -44,12 +45,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self._show_config_form(user_input)
 
-    async def _show_config_form(self, user_input): # pylint: disable=unused-argument
+    async def _show_config_form(self, user_input):  # pylint: disable=unused-argument
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
-                {vol.Required(CONF_HOST): str}
-            ),
+            data_schema=vol.Schema({vol.Required(CONF_HOST): str}),
             errors=self._errors,
         )
 
@@ -59,7 +58,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             api = RheemEziSETApi(host=host)
             await self.hass.async_add_executor_job(api.get_data)
             return True
-        except Exception as ex: # pylint: disable=broad-except
+        except Exception as ex:  # pylint: disable=broad-except
             LOGGER.error(
                 f"{DOMAIN} Exception in connection: $s - trackback: %s",
                 ex,
@@ -69,11 +68,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(
-        config_entry: config_entries.ConfigEntries
-        ) -> config_entries.OptionsFlow:
+    def async_get_options_flow(config_entry: config_entries.ConfigEntries) -> config_entries.OptionsFlow:
         """Create the options flow."""
         return OptionsFlowHandler(config_entry)
+
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
     """Options flow for Rheem EziSET."""
@@ -94,10 +92,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        CONF_SCAN_INTERVAL,
-                        description={"suggested_value": DEFAULT_SCAN_INTERVAL}
-                    ): vol.All(vol.Coerce(int)),
+                    vol.Optional(CONF_SCAN_INTERVAL, description={"suggested_value": DEFAULT_SCAN_INTERVAL}): vol.All(vol.Coerce(int)),
                 }
-            )
+            ),
         )
