@@ -28,7 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data.setdefault(DOMAIN, {})
 
     host = entry.data.get(CONF_HOST)
-    api = RheemEziSETApi(host)
+    api = RheemEziSETApi(host = host)
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
     coordinator = RheemEziSETDataUpdateCoordinator(

@@ -23,18 +23,22 @@ While this integration does not allow you to do anything which the app lets you 
 
 **This integration will set up the following entities.**
 
-Entity | Description
--- | --
-entity name prefixes | All entity names will be prefixed with the heaterName read from your device. This defaults to "Rheem" however you can use the app to change it to any 8 character alphanumeric identifier you want.
-`water_heater.water_heater` | Controls the water heater. It reads the min, current and max temps from your water heater. It also supports setting the target temperature to your desired value.
-`binary_sensor.heater_error` | Will be off for no error and on for an error. The error code will be provided in sensor.error_code (it is not known at this time  what the possible codes are)
-`sensor.flow` | The current flow rate of the water heater in L/min as reported by the water heater.
-`sensor.status` | The current status of the  water heater. Possible modes are: Idle, Heating, Bath Fill Complete (Off)
-`sensor.mode` | The current mode of the water heater. Possible modes are: Idle, Heating Control Mode, Heating (Conventional Mode), Idle (Bath Fill Mode Waiting for Tap), Heating (Bath Fill Mode), Idle (Bath Fill Mode Complete)
-`sensor.status_raw` | The raw status code provided by the water heater. Known status codes are 1, 2, 3.
-`sensor.mode_raw` | The raw mode code provided by the water heater. Known mode codes are 5, 10, 15, 20, 25, 35.
-`sensor.heater_error_raw` | The raw heater error code provided by the water heater. 0 is normal but the other codes are unknown.
-`sensor.session_timeout` | The time in seconds until the current user's session times out. This will only apply if there is a communication error with the water heater or if somebody is using the app or a physical device in the house to control the water heater. You are locked out of controls while someone else is in control.
+Entity | Enabled by Default | Description
+-- | -- | --
+entity name prefixes | | All entity names will be prefixed with the heaterName read from your device. This defaults to "Rheem" however you can use the app to change it to any 8 character alphanumeric identifier you want.
+`water_heater.water_heater` | True | Controls the water heater. It reads the min, current and max temps from your water heater. It also supports setting the target temperature to your desired value.
+`binary_sensor.heater_error` | True | Will be off for no error and on for an error. The error code will be provided in sensor.error_code (it is not known at this time  what the possible codes are)
+`binary_sensory.connectivity_problem` | True | Because of the wireless connection between the powerline unit and the module in your water heater, connectivity typically drops out multiple times per day. A connectivity problem is only raised in the event 5 successive requests fail.
+`sensor.flow` | True | The current flow rate of the water heater in L/min as reported by the water heater.
+`sensor.status` | True | The current status of the  water heater. Possible modes are: Idle, Heating, Bath Fill Complete (Off)
+`sensor.mode` | True | The current mode of the water heater. Possible modes are: Idle, Heating Control Mode, Heating (Conventional Mode), Idle (Bath Fill Mode Waiting for Tap), Heating (Bath Fill Mode), Idle (Bath Fill Mode Complete)
+`sensor.session_timeout` | True | The time in seconds until the current user's session times out. This will only apply if there is a communication error with the water heater or if somebody is using the app or a physical device in the house to control the water heater. You are locked out of controls while someone else is in control.
+`sensor.status_raw` | False | The raw status code provided by the water heater. Known status codes are 1, 2, 3.
+`sensor.mode_raw` | False | The raw mode code provided by the water heater. Known mode codes are 5, 10, 15, 20, 25, 35.
+`sensor.heater_error_raw` | False | The raw heater error code provided by the water heater. 0 is normal but the other codes are unknown.
+`sensor.current_temperature` | False | Useful for setting up a safety automation.
+`sensor.heater_model` | False | Reports the heater model. The only known model at this stage is "1".
+`sensor.heater_name` | False | Reports the internal heater name (configurable via the app).
 
 ## Installation
 
