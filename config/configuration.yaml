@@ -3,7 +3,7 @@ default_config:
 
 # https://www.home-assistant.io/integrations/logger/
 logger:
-  default: error
+  default: warning
   logs:
     custom_components.rheem_eziset: debug
 

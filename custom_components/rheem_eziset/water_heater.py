@@ -2,12 +2,7 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.water_heater import (
-    WaterHeaterEntity,
-    WaterHeaterEntityFeature,
-    STATE_GAS,
-    STATE_OFF
-)
+from homeassistant.components.water_heater import WaterHeaterEntity, WaterHeaterEntityFeature, STATE_GAS, STATE_OFF
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature, CONF_HOST, PRECISION_WHOLE
 
 from .api import RheemEziSETApi
@@ -15,26 +10,24 @@ from .const import DOMAIN
 from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
+
 async def async_setup_entry(hass, entry, async_add_devices):
     """Add water heater for passed config_entry in HA."""
     coordinator = hass.data[DOMAIN]
 
-    water_heater = [
-        RheemEziSETWaterHeater(
-            coordinator, entry
-        )
-    ]
+    water_heater = [RheemEziSETWaterHeater(coordinator, entry)]
 
     async_add_devices(water_heater, True)
+
 
 class RheemEziSETWaterHeater(RheemEziSETEntity, WaterHeaterEntity):
     """rheem_eziset Water Heater class."""
 
     def __init__(
-            self,
-            coordinator: RheemEziSETDataUpdateCoordinator,
-            entry: ConfigEntry,
-        ) -> None:
+        self,
+        coordinator: RheemEziSETDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, entry)
         self._attr_current_operation = STATE_OFF

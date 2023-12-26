@@ -10,41 +10,34 @@ from .coordinator import RheemEziSETDataUpdateCoordinator
 from .entity import RheemEziSETEntity
 
 BINARY_SENSOR_MAP = [
-    #("description", "key", "icon", "device_class", "entity_category"),
-    ("Heater error", "appErrCode", None, BinarySensorDeviceClass.PROBLEM, EntityCategory.DIAGNOSTIC), # pylint: disable=line-too-long
+    # ("description", "key", "icon", "device_class", "entity_category"),
+    ("Heater error", "appErrCode", None, BinarySensorDeviceClass.PROBLEM, EntityCategory.DIAGNOSTIC),  # pylint: disable=line-too-long
 ]
+
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Add binary sensors for passed config_entry in HA."""
     coordinator = hass.data[DOMAIN]
 
-
-
-    binary_sensors = [
-        RheemEziSETBinarySensor(
-            coordinator, entry, description, key, icon, device_class, entity_category
-        )
-        for description, key, icon, device_class, entity_category in BINARY_SENSOR_MAP
-    ]
-    binary_sensors.append(
-        RheemEziSETProblemBinarySensor(coordinator, entry)
-    )
+    binary_sensors = [RheemEziSETBinarySensor(coordinator, entry, description, key, icon, device_class, entity_category) for description, key, icon, device_class, entity_category in BINARY_SENSOR_MAP]
+    binary_sensors.append(RheemEziSETProblemBinarySensor(coordinator, entry))
 
     async_add_devices(binary_sensors, True)
+
 
 class RheemEziSETBinarySensor(RheemEziSETEntity):
     """rheem_eziset Binary Sensor class."""
 
     def __init__(
-            self,
-            coordinator: RheemEziSETDataUpdateCoordinator,
-            entry: ConfigEntry,
-            description: str,
-            key: str,
-            icon: str,
-            device_class: str,
-            entity_category: str,
-        ) -> None:
+        self,
+        coordinator: RheemEziSETDataUpdateCoordinator,
+        entry: ConfigEntry,
+        description: str,
+        key: str,
+        icon: str,
+        device_class: str,
+        entity_category: str,
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, entry)
         self._id = f"{IDPREFIX}{id}"
@@ -71,7 +64,6 @@ class RheemEziSETBinarySensor(RheemEziSETEntity):
         """Return the icon with processing in the case of some sensors."""
         return self._icon
 
-
     @property
     def device_class(self):
         """Return the device class."""
@@ -92,14 +84,15 @@ class RheemEziSETBinarySensor(RheemEziSETEntity):
         """Return the entity category."""
         return self._entity_category
 
+
 class RheemEziSETProblemBinarySensor(RheemEziSETEntity):
     """rheem_eziset Binary Sensor class."""
 
     def __init__(
-            self,
-            coordinator: RheemEziSETDataUpdateCoordinator,
-            entry: ConfigEntry,
-        ) -> None:
+        self,
+        coordinator: RheemEziSETDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, entry)
         self._id = f"{IDPREFIX}{id}"
