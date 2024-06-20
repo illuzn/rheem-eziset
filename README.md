@@ -75,6 +75,8 @@ If you want to contribute to this please read the [Contribution guidelines](CONT
 
 [bajarrr](https://github.com/bajarrr) for his work in deciphering the api.
 
+[dymondj](https://github.com/dymondj) for correcting my erroneous knowledge regarding how the powerline unit works.
+
 ## Intellectual Property
 
 Rheem and EZiSET are trademarks of Rheem Australia Pty Ltd in Australia and their respective owners worldwide. These trademarks are used on these pages under fair use and no affiliation or association with Rheem Australia Pty Ltd or any of its group companies is intended or to be inferred by the use of these marks.
