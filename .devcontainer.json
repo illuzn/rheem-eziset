@@ -1,6 +1,6 @@
 {
   "name": "illuzn/rheem_eziset",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
   "postCreateCommand": "scripts/setup",
   "forwardPorts": [8123],
   "portsAttributes": {
@@ -13,8 +13,7 @@
     "vscode": {
       "extensions": [
         "charliemarsh.ruff",
-        "ms-python.pylint",
-        "visualstudioexpteam.vscodeintellicode",
+        "ms-python.python",
         "github.vscode-pull-request-github",
         "ryanluker.vscode-coverage-gutters",
         "ms-python.vscode-pylance"
@@ -22,18 +21,17 @@
       "settings": {
         "files.eol": "\n",
         "editor.tabSize": 4,
-        "python.pythonPath": "/usr/bin/python3",
-        "python.analysis.autoSearchPaths": false,
-        "python.formatting.provider": "black",
-        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-        "editor.formatOnPaste": false,
+        "editor.formatOnPaste": true,
         "editor.formatOnSave": true,
-        "editor.formatOnType": true,
-        "files.trimTrailingWhitespace": true
+        "editor.formatOnType": false,
+        "files.trimTrailingWhitespace": true,
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.autoImportCompletions": true,
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "[python]": {
+            "editor.defaultFormatter": "charliermarsh.ruff"
+        }
       }
-    },
-    "[python]": {
-      "editor.defaultFormatter": "charliemarsh.ruff"
     }
   },
   "remoteUser": "vscode",
