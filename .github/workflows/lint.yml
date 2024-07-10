@@ -17,7 +17,7 @@ jobs:
         uses: "actions/checkout@v4.1.7"
 
       - name: "Set up Python"
-        uses: actions/setup-python@v5.0.0
+        uses: actions/setup-python@v5.1.0
         with:
           python-version: "3.12"
           cache: "pip"
@@ -25,5 +25,8 @@ jobs:
       - name: "Install requirements"
         run: python3 -m pip install -r requirements.txt
 
-      - name: "Run"
+      - name: "Lint"
         run: python3 -m ruff check .
+
+      - name: "Format"
+        run: python3 -m ruff format . --check
