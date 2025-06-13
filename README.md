@@ -9,6 +9,10 @@
 
 _Custom Component to integration to integrate [rheem_eziset][rheem_eziset] with Home Assistant._
 
+## Important
+
+There is a deprecation issue with Home Assistant 2025.6.0. I am aware of this issue and a fix is in progress. 
+
 ## Notice
 
 This component is in a release candidate stage. The released package has been tested by at least the author. The main branch should be considered beta branch. The dev branch is experimental and may break at any time.
